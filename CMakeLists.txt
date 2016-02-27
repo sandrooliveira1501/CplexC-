@@ -4,7 +4,6 @@ project(Cplex_Project)
 set(CPLEX_ROOT_DIR "/opt/ibm/ILOG/CPLEX_Studio1261")
 
 # VERSAO MINIMA DO CMAKE
-
 cmake_minimum_required(VERSION 2.8)
 
 # CXX_FLAGS - FLAGS DO COMPILADOR
@@ -25,6 +24,9 @@ INCLUDE_DIRECTORIES( ${CPLEX_INCLUDE_DIRS})
 # ACHAR OS .CPP E .H
 file(GLOB_RECURSE SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
 file(GLOB_RECURSE HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}  src/*.h)
+
+MESSAGE ("LOG")
+MESSAGE ("${SRCS}")
 
 # Linkar .cpp para este binário (que tem o nome do projeto)
 add_executable(${PROJECT_NAME} ${HEADERS} ${SRCS})
