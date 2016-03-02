@@ -4,69 +4,11 @@
 #include "arc.h"
 #include "t.h"
 #include "model_flux.h"
-#include "model.h"
+
 using namespace std;
+ILOSTLBEGIN
 
-int main(){
-
-    int n = 6;
-    int N[] = {5,4,3,2,1,0};
-    int l = 5;
-
-    vector<vector<Arc>> O = gerarTransposicoes(n);
-    cout << O.size() << endl;
-
-    //modelFlux(l,N,O,n,O.size());
-
-    model(l,N,O,n,O.size());
-}
-
-/*
-int main(){
-
-    IloEnv env;
-    try{
-
-        IloModel model(env);
-        IloNumVarArray vars(env);
-        IloRangeArray c(env);
-        IloExpr expr1(env);
-        IloExpr expr2(env);
-
-        vars.add(IloNumVar(env, 0.0,40.0));
-        vars.add(IloNumVar(env));
-        vars.add(IloNumVar(env));
-
-        expr1 -= vars[0];
-        expr1 += vars[1];
-        expr1 += vars[2];
-
-
-        c.add(-vars[0] + vars[1] + vars[2] <= 20);
-        c.add(vars[0] - 3 * vars[1] + vars[2] <= 30);
-
-        model.add(c);
-        model.add(IloMaximize(env, vars[0] + 2*vars[1] + 3*vars[2]));
-
-        IloCplex cplex(model);
-
-        cplex.solve();
-        cout << " Max =" << cplex . getObjValue () << endl ;
-
-
-    }catch(IloException& e){
-        cerr << "Concert exception caught: " << e << endl;
-    }catch(...){
-        cerr << "Unknow exception caught" << endl;
-    }
-
-    env.end();
-
-    return 0;
-}*/
-
-/*
-void model(int l, int N[], vector<vector<Arc>> O, int n, int o){
+void modelFlux(int l, int N[], vector<vector<Arc>> O, int n, int o){
 
     IloEnv env;
 
@@ -178,6 +120,8 @@ void model(int l, int N[], vector<vector<Arc>> O, int n, int o){
         //Solving the problem
         IloCplex cplex(model);
         cplex.extract(model);
+        cplex.exportModel("/home/alexsandro/modelFlux.lp");
+
         if (cplex.solve()) {
             for (int k = 0; k < l; k++){
                 for(int i = 0; i < n; i++){
@@ -199,7 +143,8 @@ void model(int l, int N[], vector<vector<Arc>> O, int n, int o){
             cplex.out() << "Optimal value: " << cplex.getObjValue() << endl;
         }
 
-
+        cplex.end();
+        model.end();
         obj.end();
 
 
@@ -208,7 +153,6 @@ void model(int l, int N[], vector<vector<Arc>> O, int n, int o){
     }catch(...){
         cerr << "Unknow exception caught" << endl;
     }
-        env.end();
 
-}*/
-
+    env.end();
+}

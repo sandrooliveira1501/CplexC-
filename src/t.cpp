@@ -1,7 +1,7 @@
-#include "arc.h"
-#include "t.h"
 #include <vector>
 #include <iostream>
+#include "arc.h"
+#include "t.h"
 
 using namespace std;
 

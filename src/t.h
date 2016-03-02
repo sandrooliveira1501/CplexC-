@@ -1,4 +1,3 @@
-#include <vector>
 
 std::vector<Arc> gerarTransposicao(int i, int j, int k, int n);
 
