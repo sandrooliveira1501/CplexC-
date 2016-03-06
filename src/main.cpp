@@ -9,9 +9,9 @@ using namespace std;
 
 int main(){
 
-    int n = 6;
-    int N[] = {5,4,3,2,1,0};
-    int l = 5;
+    int n = 8;
+    int N[] = {7,6,5,4,3,2,1,0};
+    int l = 6;
 
     vector<vector<Arc>> O = gerarTransposicoes(n);
     cout << O.size() << endl;

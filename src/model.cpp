@@ -46,16 +46,23 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
         //objective function
 
         IloExpr obj(env);
-        int cont = 0;
         for(int t = 1; t < o; t++){
             for(int k = 0; k < l; k++){
                 obj += m[t][k];
-                cont++;
             }
         }
 
         model.add(IloMinimize(env, obj));
 
+        IloExpr expr(env);
+        for(int t = 1; t < o; t++){
+            for(int k = 0; k < l; k++){
+                expr += m[t][k];
+            }
+        }
+
+        model.add(expr > 3);
+        model.add(expr < l+1);
 
         for(int a = 0; a < n; a++){
             model.add(v[0][a] == N[a]);
