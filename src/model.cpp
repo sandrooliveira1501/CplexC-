@@ -16,7 +16,6 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
 
         IloModel model(env);
 
-        //var b_ijk
         IloArray<IloArray<IloBoolVarArray>> b(env,n);
 
         for(int i = 0; i < n; i++){
@@ -28,22 +27,15 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
         }
 
 
-        //var t_k
-        //IloBoolVarArray t(env, l);
-
-        //var m_t_k
         IloArray<IloBoolVarArray> m(env,o);
         for(int t = 0; t < o; t++){
             m[t] = IloBoolVarArray(env,l);
         }
 
-        //var v_k_a
         IloArray<IloNumVarArray> v(env, l+1);
         for(int k = 0; k < l+1;k++){
             v[k] = IloNumVarArray(env,n,0,n-1);
         }
-
-        //objective function
 
         IloExpr obj(env);
         for(int t = 1; t < o; t++){
@@ -60,9 +52,6 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
                 expr += m[t][k];
             }
         }
-
-        model.add(expr > 3);
-        model.add(expr < l+1);
 
         for(int a = 0; a < n; a++){
             model.add(v[0][a] == N[a]);
@@ -82,7 +71,7 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
             }
         }
 
-        //constraint
+
         for(int k = 0; k < l; k++){
             IloExpr expr(env);
 
@@ -94,7 +83,7 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
 
         }
 
-        //constraint 1
+
         for(int k = 0; k < l; k++){
 
             for(int j = 0; j < n; j++){
@@ -108,7 +97,7 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
 
         }
 
-        //constraint 2
+
         for(int k = 0; k < l; k++){
 
             for(int i = 0; i < n; i++){
@@ -129,8 +118,6 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
             model.add(m[0][k] <= m[0][k+1]);
 
         }
-
-        //constraint 4
 
         for(int k = 0; k < l; k++){
             for(int t = 0; t < o; t++){
