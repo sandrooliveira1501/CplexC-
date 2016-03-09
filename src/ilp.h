@@ -4,8 +4,6 @@
 
 #ifndef HAVE_ILP_H
 #define HAVE_ILP_H
-
-#include <ilcplex/ilocplex.h>
 #include "./prob.h"
 
 class ILP: public Prob {

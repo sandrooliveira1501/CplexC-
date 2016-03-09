@@ -118,8 +118,8 @@ void Prob::get_bound(int P[], int n, const char *bt,
 		ub = ((tub <= rub) ? tub : rub);
 	}
 
-	std::cout << ">>> LB: " << lb << std::endl;
-	std::cout << ">>> UB: " << ub << std::endl;
+    //std::cout << ">>> LB: " << lb << std::endl;
+    //std::cout << ">>> UB: " << ub << std::endl;
 
 	return;
 } /* get_bound */

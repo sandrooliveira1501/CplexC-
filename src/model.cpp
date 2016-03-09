@@ -137,13 +137,21 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
         }
 
         //solving the problem
+        env.setOut(env.getNullStream());
         IloCplex cplex(model);
+        cplex.setOut(env.getNullStream());
+        cplex.setWarning(env.getNullStream());
+        cplex.setError(env.getNullStream());
         cplex.extract(model);
-        cplex.exportModel("/home/alexsandro/model.lp");
-        if (cplex.solve()) {
-            cplex.out() << "Optimal value: " << cplex.getObjValue() << endl;
 
-        for(int k = 0; k < l; k++){
+        //cplex.exportModel("/home/alexsandro/model.lp");
+        cplex.setParam(IloCplex::Param::TimeLimit,7200);
+
+        if (cplex.solve()) {
+            cout << "Optimal value: " << cplex.getObjValue() << endl;
+            cout << cplex.getTime() << endl;
+
+        /*for(int k = 0; k < l; k++){
             for(int i = 0; i < n; i++){
                 for(int j = 0; j < n; j++){
 
@@ -155,8 +163,10 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
 
             }
             cout << endl;
-        }
+        }*/
 
+        }else{
+            cout << "timeout" << endl;
         }
 
         cplex.end();

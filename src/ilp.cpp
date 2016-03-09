@@ -2,7 +2,10 @@
  * ilp.cpp
  */
 
+#include <ilcplex/ilocplex.h>
+#include <iostream>
 #include "ilp.h"
+using namespace std;
 
 /* Constructor */
 ILP::ILP(int *P, int n, const char *bt):
@@ -227,24 +230,39 @@ int ILP::trans_dist(int P[], int n, const char *bt)
 		model.add(IloMinimize(env, obj));
 
 		/* Solving the problem */
+              env.setOut(env.getNullStream());
 		IloCplex cplex(env);
+              cplex.setOut(env.getNullStream());
+              cplex.setWarning(env.getNullStream());
+              cplex.setError(env.getNullStream());
+
 		cplex.extract(model);
-		if (cplex.solve()) {
+              cplex.setParam(IloCplex::Param::TimeLimit,7200);
+
+
+              if (cplex.solve()) {
 			dist = 0;
 			for (k = 1; k < n; k++) {
 				dist += ((cplex.getValue(TD[k]) > 0) ? 1 : 0);
 
 			}
-			cplex.out() << std::endl ;
-			cplex.out() << "Optimal value: ";
-			cplex.out() <<  dist << std::endl;
-		}
+
+                   /*cplex.out() << std::endl ;
+                   cplex.out() << "Optimal value: ";
+                   cplex.out() <<  dist << std::endl;
+                   cplex.out() << cplex.getTime() << std::endl;*/
+
+                   cout <<  "Optimal value: " << dist << endl;
+                   cout << cplex.getTime() << endl;
+            }else{
+                  cout << "timeout" << endl;
+            }
 
 
 		obj.end();
 	}
 	catch (IloException &ex) {
-		env.out() << "Error: " << ex.getMessage() << std::endl;
+        cout << "Error: " << ex.getMessage() << endl;
 		return FAILURE;
 	}
 
@@ -440,7 +458,7 @@ int ILP::rev_dist(int P[], int n, const char *bt)
 				dist += ((cplex.getValue(RD[k]) > 0) ? 1 : 0);
 
 			}
-			cplex.out() << std::endl ;
+            cplex.out() << std::endl ;
 			cplex.out() << "Optimal value: ";
 			cplex.out() <<  dist << std::endl;
 		}

@@ -79,10 +79,10 @@ int exec(char* type, char* bound, int* N, int n)
     int perm_size = n;
 	int ret;
 
-	clock_t c_begin;
-	clock_t c_end;
+    //clock_t c_begin;
+    //clock_t c_end;
 
-	c_begin = clock();
+    //c_begin = clock();
 
     //cout << ">> Model: " << model << endl;
     //cout << ">> Bound type: " << btype << endl;
@@ -113,12 +113,12 @@ int exec(char* type, char* bound, int* N, int n)
 		cout << "Optimal value: 0" << endl;
 	}
 
-	c_end = clock();
+    //c_end = clock();
 
-	fprintf(stdout, "Total Time: %.4f\n",
-		(double) (c_end - c_begin) / CLOCKS_PER_SEC);
+    /*fprintf(stdout, "Total Time: %.4f\n",
+        (double) (c_end - c_begin) / CLOCKS_PER_SEC);*/
 
-	cout << endl;
+    //cout << endl;
 
 	/* desallocate the memory */
     //delete[] perm;
