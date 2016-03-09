@@ -5,12 +5,13 @@
 #include "t.h"
 #include "model_flux.h"
 #include "model.h"
+#include "solver.h"
 using namespace std;
 
 int main(){
 
-    int n = 8;
-    int N[] = {7,6,5,4,3,2,1,0};
+    int n = 3;
+    int N[] = {2,1,0};
     int l = 6;
 
     vector<vector<Arc>> O = gerarTransposicoes(n);
@@ -18,7 +19,14 @@ int main(){
 
     //modelFlux(l,N,O,n,O.size());
 
-    model(l,N,O,n,O.size());
+    //model(l,N,O,n,O.size());
+
+    for(int i = 0; i < n; i++){
+        N[i] = N[i] + 1;
+    }
+
+    exec("trans", "def", N, n);
+
 }
 
 /*

@@ -120,8 +120,11 @@ void modelFlux(int l, int N[], vector<vector<Arc>> O, int n, int o){
         //Solving the problem
         IloCplex cplex(model);
         cplex.extract(model);
-        cplex.exportModel("/home/alexsandro/modelFlux.lp");
 
+        //timeout
+        cplex.setParam(IloCplex::Param::TimeLimit,5);
+
+        cplex.exportModel("/home/alexsandro/modelFlux.lp");
         if (cplex.solve()) {
             for (int k = 0; k < l; k++){
                 for(int i = 0; i < n; i++){
@@ -141,6 +144,8 @@ void modelFlux(int l, int N[], vector<vector<Arc>> O, int n, int o){
 
             }
             cplex.out() << "Optimal value: " << cplex.getObjValue() << endl;
+        }else{
+            cout << "timeout" << endl;
         }
 
         cplex.end();

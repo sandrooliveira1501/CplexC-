@@ -1,8 +1,4 @@
-#include <iostream>
-#include <sstream>
-#include <ctime>
-#include <cstdio>
-#include "../include/ilp.h"
+#include "solver.h"
 
 using namespace std;
 
@@ -73,14 +69,14 @@ int *perm2int(const char perm[], int &n)
 
 } /* perm2int */
 
-int main(int argc, const char *argv[])
+int exec(char* type, char* bound, int* N, int n)
 {
 
-	const char *model = argv[1];
-	const char *btype = argv[2];
-	const char *char_perm = argv[3];
-	int *perm;
-	int perm_size;
+    const char *model = type;
+    const char *btype = bound;
+    //const char *char_perm = N;
+    int *perm = N;
+    int perm_size = n;
 	int ret;
 
 	clock_t c_begin;
@@ -88,21 +84,14 @@ int main(int argc, const char *argv[])
 
 	c_begin = clock();
 
-	if (argc < 4) {
-		usage(argv[0]);
-		return 1;
-	}
+    //cout << ">> Model: " << model << endl;
+    //cout << ">> Bound type: " << btype << endl;
+    //cout << ">> Permutation: " << char_perm << endl;
 
-	cout << ">> Model: " << model << endl;
-	cout << ">> Bound type: " << btype << endl;
-	cout << ">> Permutation: " << char_perm << endl;
-
-	perm = perm2int(char_perm, perm_size);
+    //perm = perm2int(char_perm, perm_size);
 
 	/* Creating the object problem */
 	ILP prob(perm, perm_size, btype);
-
-	cout << endl;
 
 	ret = -1;
 
@@ -117,7 +106,7 @@ int main(int argc, const char *argv[])
 	}
 	else {
 		cerr << ">> ERROR: Model not found" << endl << endl;
-		usage(argv[0]);
+        //usage(argv[0]);
 	}
 
 	if (ret == 0) {
@@ -132,7 +121,7 @@ int main(int argc, const char *argv[])
 	cout << endl;
 
 	/* desallocate the memory */
-	delete[] perm;
+    //delete[] perm;
 
 	return 0;
 
