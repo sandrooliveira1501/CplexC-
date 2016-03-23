@@ -50,7 +50,8 @@ void Lagrange::execute(){
                 cout << "Optimal value: " << cplex.getObjValue() << endl;
                 cout << cplex.getTime() << endl;
 
-                this->ZLB = cplex.getObjValue();
+                cplex.getObjValue();
+                this->ZLB = (cplex.getObjValue() > this->ZLB)? cplex.getObjValue(): this->ZLB;
 
                 //transformar ZLB em uma solução viável
 

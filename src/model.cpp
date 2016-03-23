@@ -46,13 +46,6 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
 
         model.add(IloMinimize(env, obj));
 
-        IloExpr expr(env);
-        for(int t = 1; t < o; t++){
-            for(int k = 0; k < l; k++){
-                expr += m[t][k];
-            }
-        }
-
         for(int a = 0; a < n; a++){
             model.add(v[0][a] == N[a]);
         }
@@ -67,6 +60,7 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
                     IloIfThen expr(env, b[i][a][k-1] == 1, v[k][a] == v[k-1][i]);
                     //expr += (b[i][a][k-1] * v[k-1][i]);
                     model.add(expr);
+                    //problem ending IloIfThen expression
                 }
             }
         }
@@ -80,7 +74,7 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
             }
 
             model.add(expr == 1);
-
+            expr.end();
         }
 
 
@@ -92,7 +86,7 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
                     expr += b[i][j][k];
                 }
                 model.add(expr == 1);
-
+                expr.end();
             }
 
         }
@@ -106,7 +100,7 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
                     expr += b[i][j][k];
                 }
                 model.add(expr == 1);
-
+                expr.end();
             }
 
         }
@@ -132,6 +126,8 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
 
                 IloIfThen ifExpr(env, m[t][k] == 1, expr == n);
                 model.add(ifExpr);
+                expr.end();
+                //problem ending IloIfThen expression
             }
 
         }
@@ -144,27 +140,12 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
         cplex.setError(env.getNullStream());
         cplex.extract(model);
 
-        //cplex.exportModel("/home/alexsandro/model.lp");
+        //cplex.exportModel("/home/alexsandro/model2.lp");
         cplex.setParam(IloCplex::Param::TimeLimit,7200);
 
         if (cplex.solve()) {
             cout << "Optimal value: " << cplex.getObjValue() << endl;
             cout << cplex.getTime() << endl;
-
-        /*for(int k = 0; k < l; k++){
-            for(int i = 0; i < n; i++){
-                for(int j = 0; j < n; j++){
-
-                    if(cplex.getValue(b[i][j][k]) == 1){
-                        cout << i << " - " << j << " = ";
-                    }
-
-                }
-
-            }
-            cout << endl;
-        }*/
-
         }else{
             cout << "timeout" << endl;
         }

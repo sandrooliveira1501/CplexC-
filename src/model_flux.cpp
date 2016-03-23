@@ -55,7 +55,6 @@ void modelFlux(int l, int N[], vector<vector<Arc>> O, int n, int o){
             model.add(IloSum(z[k]) == 1);
         }
 
-
         // outgoing
         for(int i = 0; i < n; i++){
            model.add(IloSum(x[0][i][i]) == 1);
@@ -68,6 +67,7 @@ void modelFlux(int l, int N[], vector<vector<Arc>> O, int n, int o){
                 expr += x[l-1][i][j][N[i]];
             }
             model.add(expr == 1);
+            expr.end();
         }
 
         //conservation
@@ -82,6 +82,7 @@ void modelFlux(int l, int N[], vector<vector<Arc>> O, int n, int o){
                     }
 
                     model.add(expr == 0);
+                    expr.end();
                 }
 
             }
@@ -108,6 +109,9 @@ void modelFlux(int l, int N[], vector<vector<Arc>> O, int n, int o){
                         }
 
                         model.add(flowCapacityTerm1 <= flowCapacityTerm2);
+
+                        flowCapacityTerm1.end();
+                        flowCapacityTerm2.end();
                 }
             }
         }
@@ -132,25 +136,8 @@ void modelFlux(int l, int N[], vector<vector<Arc>> O, int n, int o){
         //timeout
         cplex.setParam(IloCplex::Param::TimeLimit,7200);
 
-        cplex.exportModel("/home/alexsandro/modelFlux.lp");
+        //cplex.exportModel("home/alexsandro/model1.lp");
         if (cplex.solve()) {
-            /*for (int k = 0; k < l; k++){
-                for(int i = 0; i < n; i++){
-                    cout << " k " << k << " i " << i << endl;
-                    for(int a = 0; a < n; a++){
-
-                        for(int b = 0; b < n; b++){
-                            if(cplex.getValue(x[k][i][a][b]) == 1){
-                                cout << "a " << a << " b " << b << " ";
-                            }
-                        }
-
-                    }
-                    cout << endl;
-
-                }
-
-            }*/
             cout << "Optimal value: " << cplex.getObjValue() << endl;
             cout << cplex.getTime() << endl;
         }else{
