@@ -1,2 +1,2 @@
 
-void modelFlux(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o);
+void modelFlux(int l, int N[],int ord[], std::vector<std::vector<Arc>> O, int n, int o);

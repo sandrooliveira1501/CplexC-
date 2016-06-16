@@ -10,7 +10,8 @@
 using namespace std;
 
 int main(int argc, const char *argv[]){
-    if(argc < 2){
+
+    /*if(argc < 2){
         cout << "Especifique caminho do arquivo de entrada" << endl;
         return 1;
     }
@@ -73,18 +74,21 @@ int main(int argc, const char *argv[]){
 
     }
 
-    infile.close();
-/*
-    int n = 5;
-    int N[] = {4,3,2,1,0};
-    int l = 4;
+    infile.close();*/
+
+
+
+    int n = 7;
+    int N[] = {6,5,4,3,2,1,0};
+    int ord[] = {6,5,4,3,2,1,0};
+    int l = 5;
 
     vector<vector<Arc>> O = gerarTransposicoes(n);
     cout << O.size() << endl;
 
-    modelFlux(l,N,O,n,O.size());
+    modelFlux(l,N,ord,O,n,O.size());
 
-    model(l,N,O,n,O.size());
+    //model(l,N,O,n,O.size());
 
     //for(int i = 0; i < n; i++){
     //    N[i] = N[i] + 1;
@@ -92,8 +96,8 @@ int main(int argc, const char *argv[]){
 
     //exec("trans", "def", N, n);
 
-    Lagrange lagrange(l,N,O,n,O.size(),2);
+    //Lagrange lagrange(l,N,O,n,O.size(),2);
 
-    lagrange.execute();*/
+    //lagrange.execute();
 
 }

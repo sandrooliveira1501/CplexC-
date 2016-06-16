@@ -9,7 +9,7 @@
 using namespace std;
 ILOSTLBEGIN
 
-void modelFlux(int l, int N[], vector<vector<Arc>> O, int n, int o){
+void modelFlux(int l, int N[],int  ord[], vector<vector<Arc>> O, int n, int o){
 
     IloEnv env;
 
@@ -122,12 +122,58 @@ void modelFlux(int l, int N[], vector<vector<Arc>> O, int n, int o){
             model.add(z[k][0] <= z[k+1][0]);
         }
 
+        //extra
+
+        /*for (int k = 0; k < l-1; k++){
+
+            //cout << "k = " << k << endl;
+            for (int i = 0; i < (n-1); i++){
+
+                for(int j = 1; (j+k) < l; j++){
+
+                    //cout << "i = " << i << endl;
+                    for(int a = 0; a < n; a++){
+
+                        //cout << "a = " << a << endl;
+                        for(int a2 = 0; a2 < n; a2++){
+
+                            //cout << "a2 = " << a2 << endl;
+                            for(int b = 0; b < (n-1); b++){
+
+                                //cout << "b = " << b << endl;
+                                for(int b2 = 0; b2 < (n-1); b2++){
+
+                                    //cout << "b2 = " << b2 << endl;
+                                    //cout << ord[i] << endl;
+                                    //cout << ord[i+1] << endl;
+                                    model.add(x[k][ord[i]][a][b] + x[k][ord[i+1]][a2][b+1] + x[k+j][ord[i]][b][b2] <= x[k+j][ord[i+1]][b+1][b2+1] + 2);
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }*/
+
+        for(int k = 0; k < (l-1); k++){
+            for(int a = 0; a < n; a++){
+                model.add(x[k][ord[0]][a][1] <= x[k+1][ord[0]][1][1]);
+            }
+        }
+
+        for(int k = 0; k < (l-1); k++){
+            for(int a = 0; a < n; a++){
+                model.add(x[k][ord[n-1]][a][n-1] <= x[k+1][ord[n-1]][n-1][n-1]);
+            }
+        }
+
         //Solving the problem
-        env.setOut(env.getNullStream());
+        //env.setOut(env.getNullStream());
         IloCplex cplex(model);
-        cplex.setOut(env.getNullStream());
-        cplex.setWarning(env.getNullStream());
-        cplex.setError(env.getNullStream());
+        //cplex.setOut(env.getNullStream());
+        //cplex.setWarning(env.getNullStream());
+        //cplex.setError(env.getNullStream());
 
         cplex.extract(model);
 
