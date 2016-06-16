@@ -78,9 +78,9 @@ int main(int argc, const char *argv[]){
 
 
 
-    int n = 7;
-    int N[] = {6,5,4,3,2,1,0};
-    int ord[] = {6,5,4,3,2,1,0};
+    int n = 8;
+    int N[] = {7,6,5,4,3,2,1,0};
+    int ord[] = {7,6,5,4,3,2,1,0};
     int l = 5;
 
     vector<vector<Arc>> O = gerarTransposicoes(n);
