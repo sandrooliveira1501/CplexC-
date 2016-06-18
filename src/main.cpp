@@ -11,7 +11,7 @@ using namespace std;
 
 int main(int argc, const char *argv[]){
 
-    /*if(argc < 2){
+    if(argc < 2){
         cout << "Especifique caminho do arquivo de entrada" << endl;
         return 1;
     }
@@ -28,6 +28,7 @@ int main(int argc, const char *argv[]){
         int n = 0,tmp;
 
         int *N;
+        int *ord;
 
         istringstream tmp_iss(line);
 
@@ -38,10 +39,19 @@ int main(int argc, const char *argv[]){
         }
 
         N = new int[n];
+        ord = new int[n];
         tmp = 0;
 
         istringstream iss(line);
         while(iss >> N[tmp]){
+            tmp++;
+        }
+
+        getline(infile, line);
+
+        tmp = 0;
+        istringstream issOrd(line);
+        while(issOrd >> ord[tmp]){
             tmp++;
         }
 
@@ -57,11 +67,15 @@ int main(int argc, const char *argv[]){
         vector<vector<Arc>> O = gerarTransposicoes(n);
 
 
+        cout << "Multicommodity flow model - extra" << endl;
+        modelFlux(l,N,ord,true, O,n,O.size());
+
+
         cout << "Multicommodity flow model" << endl;
-        modelFlux(l,N,O,n,O.size());
+        modelFlux(l,N,ord,false, O,n,O.size());
 
 
-        cout << "Perfect Matching model" << endl;
+        /*cout << "Perfect Matching model" << endl;
         model(l,N,O,n,O.size());
 
 
@@ -70,23 +84,23 @@ int main(int argc, const char *argv[]){
         }
 
         cout << "Zanoni and Cid model" << endl;
-        exec("trans", "def", N, n);
+        exec("trans", "def", N, n);*/
 
     }
 
-    infile.close();*/
+    infile.close();
 
 
 
-    int n = 8;
+    /*int n = 8;
     int N[] = {7,6,5,4,3,2,1,0};
     int ord[] = {7,6,5,4,3,2,1,0};
-    int l = 5;
+    int l = 6;
 
     vector<vector<Arc>> O = gerarTransposicoes(n);
     cout << O.size() << endl;
 
-    modelFlux(l,N,ord,O,n,O.size());
+    modelFlux(l,N,ord,false, O,n,O.size());*/
 
     //model(l,N,O,n,O.size());
 

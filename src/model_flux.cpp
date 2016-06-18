@@ -9,7 +9,7 @@
 using namespace std;
 ILOSTLBEGIN
 
-void modelFlux(int l, int N[],int  ord[], vector<vector<Arc>> O, int n, int o){
+void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int n, int o){
 
     IloEnv env;
 
@@ -123,83 +123,89 @@ void modelFlux(int l, int N[],int  ord[], vector<vector<Arc>> O, int n, int o){
         }
 
         //extra
-        for (int k = 0; k < l-1; k++){
+        if(extra){
+            //cout << "Adicionando restrições extras" << endl;
+            for (int k = 0; k < l-1; k++){
 
-            //cout << "k = " << k << endl;
-            for (int i = 0; i < (n-1); i++){
+                //cout << "k = " << k << endl;
+                for (int i = 0; i < (n-1); i++){
 
-                //cout << "a2 = " << a2 << endl;
-                for(int b = 0; b < (n-1); b++){
+                    //cout << "a2 = " << a2 << endl;
+                    for(int b = 0; b < (n-1); b++){
 
-                    //cout << "b = " << b << endl;
-                        //for(int j = 1; (k+j) <= (l-1); j++){
-                            //cout << "b2 = " << b2 << endl;
-                            //cout << ord[i] << endl;
-                            //cout << ord[i+1] << endl;
-                            int j = (l-1) - k;
-                            IloExpr expr1(env);
-                            IloExpr expr2(env);
-                            for(int a = 0; a < n; a ++){
-                                expr1 += x[k][ord[i]][a][b];
-                                expr2 += x[k][ord[i+1]][a][b+1];
-                            }
+                        //cout << "b = " << b << endl;
+                            //for(int j = 1; (k+j) <= (l-1); j++){
+                                //cout << "b2 = " << b2 << endl;
+                                //cout << ord[i] << endl;
+                                //cout << ord[i+1] << endl;
+                                //int j = (l-1) - k;
+                                IloExpr expr1(env);
+                                IloExpr expr2(env);
+                                for(int a = 0; a < n; a ++){
+                                    expr1 += x[k][ord[i]][a][b];
+                                    expr2 += x[k][ord[i+1]][a][b+1];
+                                }
 
-                            IloExpr expr3(env);
-                            IloExpr expr4(env);
-                            for(int b2 = 0; b2 < (n-1); b2++){
-                                expr3 = x[k+j][ord[i]][b][b2] - x[k+j][ord[i+1]][b+1][b2+1];
-                                expr4 = x[k+1][ord[i]][b][b2] - x[k+1][ord[i+1]][b+1][b2+1];
-                            }
+                                IloExpr expr3(env);
+                                IloExpr expr4(env);
+                                for(int b2 = 0; b2 < (n-1); b2++){
+                                    expr4 = x[k+1][ord[i]][b][b2] - x[k+1][ord[i+1]][b+1][b2+1];
+                                }
 
-                            //model.add(expr1 + expr2 + expr3 <= 2);
-                            model.add(expr1 + expr2 + expr4 <= 2);
+                                model.add(expr1 + expr2 + expr4 <= 2);
 
-                            //model.add(expr1 + expr2 + x[k+j][ord[i]][b][b2] <= x[k+j][ord[i+1]][b+1][b2+1] + 2);
+                                //model.add(expr1 + expr2 + x[k+j][ord[i]][b][b2] <= x[k+j][ord[i+1]][b+1][b2+1] + 2);
 
-                            //model.add(expr1 + expr2 + x[k+1][ord[i]][b][b2] <= x[k+1][ord[i+1]][b+1][b2+1] + 2);
-                        //}
+                                //model.add(expr1 + expr2 + x[k+1][ord[i]][b][b2] <= x[k+1][ord[i+1]][b+1][b2+1] + 2);
+                            //}
 
+                    }
                 }
             }
-        }
 
-        for(int k = 0; k < (l-1); k++){
-            for(int a = 0; a < n; a++){
-                model.add(x[k][ord[0]][a][1] <= x[k+1][ord[0]][1][1]);
+            for(int k = 0; k < (l-1); k++){
+                IloExpr expr(env);
+                for(int a = 0; a < n; a++){
+                    expr += x[k][ord[0]][a][1];
+                    //model.add(x[k][ord[0]][a][1] <= x[k+1][ord[0]][1][1]);
+                }
+                model.add(expr <= x[k+1][ord[0]][1][1]);
+
             }
-        }
 
-        for(int k = 0; k < (l-1); k++){
-            for(int a = 0; a < n; a++){
-                model.add(x[k][ord[n-1]][a][n-1] <= x[k+1][ord[n-1]][n-1][n-1]);
+            for(int k = 0; k < (l-1); k++){
+                IloExpr expr(env);
+                for(int a = 0; a < n; a++){
+                    expr += x[k][ord[n-1]][a][n-1];
+                    //model.add(x[k][ord[n-1]][a][n-1] <= x[k+1][ord[n-1]][n-1][n-1]);
+                }
+                model.add(expr <= x[k+1][ord[n-1]][n-1][n-1]);
             }
         }
 
         //Solving the problem
-        //env.setOut(env.getNullStream());
+        env.setOut(env.getNullStream());
         IloCplex cplex(model);
-        //cplex.setOut(env.getNullStream());
-        //cplex.setWarning(env.getNullStream());
-        //cplex.setError(env.getNullStream());
+        cplex.setOut(env.getNullStream());
+        cplex.setWarning(env.getNullStream());
+        cplex.setError(env.getNullStream());
 
         cplex.extract(model);
-
-
 
         //timeout
         cplex.setParam(IloCplex::Param::TimeLimit,7200);
         //IloCplex::Param::MIP::Strategy::HeuristicFreq
-        cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
+        //cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
         //IloCplex::Param::MIP::Display
 
         //cplex.setParam(IloCplex::Param::MIP::Display,4);
         //cplex.setParam(IloCplex::RootAlg,6);
         //cplex.setParam(IloCplex::NodeAlg,6);
-        cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 4);
+        //cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 4);
         //cplex.setParam(IloCplex::MIPEmphasis, 1);
         cplex.setParam(IloCplex::Param::MIP::Tolerances::UpperCutoff, l);
 
-        cplex.exportModel("/home/sandro/model1.lp");
+        //cplex.exportModel("/home/sandro/model1.lp");
         if (cplex.solve()) {
             cout << "Optimal value: " << cplex.getObjValue() << endl;
             cout << cplex.getTime() << endl;
