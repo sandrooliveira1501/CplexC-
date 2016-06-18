@@ -133,12 +133,12 @@ void model(int l, int N[], std::vector<std::vector<Arc>> O, int n, int o){
         }
 
         //solving the problem
-        env.setOut(env.getNullStream());
+        //env.setOut(env.getNullStream());
         IloCplex cplex(model);
-        cplex.setOut(env.getNullStream());
-        cplex.setWarning(env.getNullStream());
-        cplex.setError(env.getNullStream());
-        cplex.extract(model);
+        //cplex.setOut(env.getNullStream());
+        //cplex.setWarning(env.getNullStream());
+        //cplex.setError(env.getNullStream());
+        //cplex.extract(model);
 
         //cplex.exportModel("/home/alexsandro/model2.lp");
         cplex.setParam(IloCplex::Param::TimeLimit,7200);

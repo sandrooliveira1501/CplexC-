@@ -27,13 +27,13 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
         }
 
         // var x_{kiab}
-        IloArray<IloArray<IloArray<IloIntVarArray>>> x(env, l);
+        IloArray<IloArray<IloArray<IloBoolVarArray>>> x(env, l);
         for (int i = 0; i < l; i++) {
-            x[i] = IloArray<IloArray<IloIntVarArray> > (env, n);
+            x[i] = IloArray<IloArray<IloBoolVarArray> > (env, n);
             for (int j = 0; j < n; j++) {
-                x[i][j] = IloArray<IloIntVarArray> (env, n);
+                x[i][j] = IloArray<IloBoolVarArray> (env, n);
                 for (int k = 0; k < n; k++) {
-                    x[i][j][k] = IloIntVarArray (env,n,0,IloIntMax);
+                    x[i][j][k] = IloBoolVarArray (env,n);
                 }
             }
         }
@@ -166,42 +166,42 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
             for(int k = 0; k < (l-1); k++){
                 IloExpr expr(env);
                 for(int a = 0; a < n; a++){
-                    expr += x[k][ord[0]][a][1];
-                    //model.add(x[k][ord[0]][a][1] <= x[k+1][ord[0]][1][1]);
+                    //expr += x[k][ord[0]][a][0];
+                    model.add(x[k][ord[0]][a][0] <= x[k+1][ord[0]][0][0]);
                 }
-                model.add(expr <= x[k+1][ord[0]][1][1]);
+                //model.add(expr <= x[k+1][ord[0]][0][0]);
 
             }
 
             for(int k = 0; k < (l-1); k++){
                 IloExpr expr(env);
                 for(int a = 0; a < n; a++){
-                    expr += x[k][ord[n-1]][a][n-1];
-                    //model.add(x[k][ord[n-1]][a][n-1] <= x[k+1][ord[n-1]][n-1][n-1]);
+                    //expr += x[k][ord[n-1]][a][n-1];
+                    model.add(x[k][ord[n-1]][a][n-1] <= x[k+1][ord[n-1]][n-1][n-1]);
                 }
-                model.add(expr <= x[k+1][ord[n-1]][n-1][n-1]);
+                //model.add(expr <= x[k+1][ord[n-1]][n-1][n-1]);
             }
         }
 
         //Solving the problem
-        env.setOut(env.getNullStream());
+        //env.setOut(env.getNullStream());
         IloCplex cplex(model);
-        cplex.setOut(env.getNullStream());
-        cplex.setWarning(env.getNullStream());
-        cplex.setError(env.getNullStream());
+        //cplex.setOut(env.getNullStream());
+        //cplex.setWarning(env.getNullStream());
+        //cplex.setError(env.getNullStream());
 
         cplex.extract(model);
 
         //timeout
         cplex.setParam(IloCplex::Param::TimeLimit,7200);
         //IloCplex::Param::MIP::Strategy::HeuristicFreq
-        //cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
+        cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
         //IloCplex::Param::MIP::Display
 
         //cplex.setParam(IloCplex::Param::MIP::Display,4);
         //cplex.setParam(IloCplex::RootAlg,6);
         //cplex.setParam(IloCplex::NodeAlg,6);
-        //cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 4);
+        cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 4);
         //cplex.setParam(IloCplex::MIPEmphasis, 1);
         cplex.setParam(IloCplex::Param::MIP::Tolerances::UpperCutoff, l);
 

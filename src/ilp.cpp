@@ -230,11 +230,11 @@ int ILP::trans_dist(int P[], int n, const char *bt)
 		model.add(IloMinimize(env, obj));
 
 		/* Solving the problem */
-              env.setOut(env.getNullStream());
+              //env.setOut(env.getNullStream());
 		IloCplex cplex(env);
-              cplex.setOut(env.getNullStream());
-              cplex.setWarning(env.getNullStream());
-              cplex.setError(env.getNullStream());
+              //cplex.setOut(env.getNullStream());
+              //cplex.setWarning(env.getNullStream());
+              //cplex.setError(env.getNullStream());
 
 		cplex.extract(model);
               cplex.setParam(IloCplex::Param::TimeLimit,7200);
