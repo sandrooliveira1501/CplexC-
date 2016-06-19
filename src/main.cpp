@@ -11,18 +11,18 @@ using namespace std;
 
 int main(int argc, const char *argv[]){
 
-    if(argc < 2){
+    /*if(argc < 2){
         cout << "Especifique caminho do arquivo de entrada" << endl;
         return 1;
-    }
+    }*/
 
-    const char* filename = argv[1];
+    //const char* filename = argv[1];
+    const char* filename = "entrada.dat";
 
     ifstream infile;
     infile.open(filename);
 
     std::string line;
-
 
     while (getline(infile, line)){
         int n = 0,tmp;
@@ -68,11 +68,12 @@ int main(int argc, const char *argv[]){
 
 
 
+        cout << "Multicommodity flow model - extra" << endl;
+        modelFlux(l,N,ord,true, O,n,O.size());
+
         cout << "Multicommodity flow model" << endl;
         modelFlux(l,N,ord,false, O,n,O.size());
 
-        cout << "Multicommodity flow model - extra" << endl;
-        modelFlux(l,N,ord,true, O,n,O.size());
 
         /*cout << "Perfect Matching model" << endl;
         model(l,N,O,n,O.size());
