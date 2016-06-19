@@ -66,13 +66,13 @@ int main(int argc, const char *argv[]){
 
         vector<vector<Arc>> O = gerarTransposicoes(n);
 
-        cout << "Multicommodity flow model - extra" << endl;
-        modelFlux(l,N,ord,true, O,n,O.size());
 
 
         cout << "Multicommodity flow model" << endl;
         modelFlux(l,N,ord,false, O,n,O.size());
 
+        cout << "Multicommodity flow model - extra" << endl;
+        modelFlux(l,N,ord,true, O,n,O.size());
 
         /*cout << "Perfect Matching model" << endl;
         model(l,N,O,n,O.size());
