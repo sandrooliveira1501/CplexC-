@@ -32,12 +32,30 @@ function generatePermutation(n){
     entrada += "," + (permutation[i] + 1);
   }
   //console.log(entrada);
-  var command = "python2.6 ../code_dias2012/elias2005.py " + entrada;
-  //console.log(command);
+  var command = "python2.6 ../code_dias2012/dias2010_1_375.py " + entrada;
+  var command2 = "python2.6 ../code_dias2012/elias2005.py " + entrada;
+  var command3 = "python2.6 ../code_dias2012/dias2010_1_5.py " + entrada;
+
   var process = sh.exec(command, {silent:true});
   var output = _.split(process.stdout, " - ");
   var l = output[2];
-  //console.log(l);
+
+  if(output[0].startsWith("Erro")){
+    process = sh.exec(command2, {silent:true});
+    output = _.split(process.stdout, " - ");
+    l = output[2];
+
+    if(output[0].startsWith("Erro")){
+      process = sh.exec(command3, {silent:true});
+      output = _.split(process.stdout, " - ");
+      l = output[2];
+
+      if(output[0].startsWith("Erro")){
+        return false;
+      }
+    }
+
+  }
 
   var permutationOutput = "";
   var ordOutput = "";
@@ -53,6 +71,8 @@ function generatePermutation(n){
   console.log(permutationOutput)
   console.log(ordOutput)
   console.log(l)
+
+  return true;
 }
 
 module.exports = obj;
