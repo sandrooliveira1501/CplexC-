@@ -69,8 +69,6 @@ bool contains(Arc arc,std::vector<Arc> arcs){
         }
     }
 
-
-
     return false;
 }
 

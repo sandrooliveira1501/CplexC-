@@ -75,11 +75,11 @@ int main(int argc, const char *argv[]){
         modelFlux(l,N,ord,false, O,n,O.size());
 
 
-        /*cout << "Perfect Matching model" << endl;
-        model(l,N,O,n,O.size());
+        //cout << "Perfect Matching model" << endl;
+        //model(l,N,ord,O,n,O.size());
 
 
-        for(int i = 0; i < n; i++){
+        /*for(int i = 0; i < n; i++){
             N[i] = N[i] + 1;
         }
 

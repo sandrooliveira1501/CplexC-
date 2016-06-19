@@ -27,13 +27,13 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
         }
 
         // var x_{kiab}
-        IloArray<IloArray<IloArray<IloBoolVarArray>>> x(env, l);
+        IloArray<IloArray<IloArray<IloIntVarArray>>> x(env, l);
         for (int i = 0; i < l; i++) {
-            x[i] = IloArray<IloArray<IloBoolVarArray> > (env, n);
+            x[i] = IloArray<IloArray<IloIntVarArray> > (env, n);
             for (int j = 0; j < n; j++) {
-                x[i][j] = IloArray<IloBoolVarArray> (env, n);
+                x[i][j] = IloArray<IloIntVarArray> (env, n);
                 for (int k = 0; k < n; k++) {
-                    x[i][j][k] = IloBoolVarArray (env,n);
+                    x[i][j][k] = IloIntVarArray (env,n,0, 1);
                 }
             }
         }
@@ -91,27 +91,27 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
         // just the arcs that are in mi can be used
 
 
-            for(int a = 0; a < n; a++){
-                for(int b = 0; b < n; b++){
-                    for(int k  = 0; k < l; k++){
-                        IloExpr flowCapacityTerm1(env);
-                        IloExpr flowCapacityTerm2(env);
+        for(int a = 0; a < n; a++){
+            for(int b = 0; b < n; b++){
+                for(int k  = 0; k < l; k++){
+                    IloExpr flowCapacityTerm1(env);
+                    IloExpr flowCapacityTerm2(env);
 
-                        for(int i = 0; i < n; i++){
-                            flowCapacityTerm1 += x[k][i][a][b];
+                    for(int i = 0; i < n; i++){
+                        flowCapacityTerm1 += x[k][i][a][b];
+                    }
+
+                    for(int y = 0; y < o; y++){
+                        Arc arc(a,b);
+                        if(contains(arc, O[y])){
+                            flowCapacityTerm2 += z[k][y];
                         }
+                    }
 
-                        for(int y = 0; y < o; y++){
-                            Arc arc(a,b);
-                            if(contains(arc, O[y])){
-                                flowCapacityTerm2 += z[k][y];
-                            }
-                        }
+                    model.add(flowCapacityTerm1 <= flowCapacityTerm2);
 
-                        model.add(flowCapacityTerm1 <= flowCapacityTerm2);
-
-                        flowCapacityTerm1.end();
-                        flowCapacityTerm2.end();
+                    flowCapacityTerm1.end();
+                    flowCapacityTerm2.end();
                 }
             }
         }
@@ -124,8 +124,8 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
 
         //extra
         if(extra){
-            //cout << "Adicionando restrições extras" << endl;
-            for (int k = 0; k < l-1; k++){
+            cout << "Restrições extras" << endl;
+            for (int k = l/2; k < l-1; k++){
 
                 //cout << "k = " << k << endl;
                 for (int i = 0; i < (n-1); i++){
@@ -146,13 +146,10 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
                                     expr2 += x[k][ord[i+1]][a][b+1];
                                 }
 
-                                IloExpr expr3(env);
-                                IloExpr expr4(env);
                                 for(int b2 = 0; b2 < (n-1); b2++){
-                                    expr4 = x[k+1][ord[i]][b][b2] - x[k+1][ord[i+1]][b+1][b2+1];
+                                    model.add(expr1 + expr2 + x[k+1][ord[i]][b][b2] - x[k+1][ord[i+1]][b+1][b2+1] <= 2);
                                 }
 
-                                model.add(expr1 + expr2 + expr4 <= 2);
 
                                 //model.add(expr1 + expr2 + x[k+j][ord[i]][b][b2] <= x[k+j][ord[i+1]][b+1][b2+1] + 2);
 
@@ -163,23 +160,61 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
                 }
             }
 
-            for(int k = 0; k < (l-1); k++){
-                IloExpr expr(env);
-                for(int a = 0; a < n; a++){
-                    //expr += x[k][ord[0]][a][0];
-                    model.add(x[k][ord[0]][a][0] <= x[k+1][ord[0]][0][0]);
-                }
-                //model.add(expr <= x[k+1][ord[0]][0][0]);
+            if(ord[0] == 0){
+                int stripInicial = 0;
 
+                while((stripInicial < (n-1)) && N[stripInicial + 1] - N[stripInicial] == 1){
+                    stripInicial++;
+                }
+                for(int i = 0; i <= stripInicial; i++){
+                    for(int k = 0; k < l; k++){
+                       model.add(x[k][i][i][i] == 1);
+                    }
+                }
+            }
+
+            if(ord[n-1] == (n-1)){
+                int stripFinal = n-1;
+
+                while((stripFinal > 0) && N[stripFinal] - N[stripFinal - 1] == 1){
+                    stripFinal--;
+                }
+
+                for(int i = n-1; i >= stripFinal; i--){
+                   for(int k = 0; k < l; k++){
+                       model.add(x[k][i][i][i] == 1);
+                    }
+                }
             }
 
             for(int k = 0; k < (l-1); k++){
-                IloExpr expr(env);
-                for(int a = 0; a < n; a++){
-                    //expr += x[k][ord[n-1]][a][n-1];
-                    model.add(x[k][ord[n-1]][a][n-1] <= x[k+1][ord[n-1]][n-1][n-1]);
+                for(int m = 0; m < n; m++){
+                    IloExpr expr(env);
+                    IloExpr expr2(env);
+                    for(int i = 0; i <= m; i++){
+                        expr += x[k][ord[i]][i][i];
+                        expr2 += (x[k+1][ord[i]][i][i]);
+                    }
+                    expr2 /= (m+1);
+                    expr2 += m;
+
+                    model.add(expr <= expr2);
                 }
-                //model.add(expr <= x[k+1][ord[n-1]][n-1][n-1]);
+            }
+
+            for(int k = 0; k < (l-1); k++){
+                for(int m = 1; m <= n; m++){
+                    IloExpr expr(env);
+                    IloExpr expr2(env);
+                    for(int i = n-1; i >= (n-m); i--){
+                        expr += x[k][ord[i]][i][i];
+                        expr2 += (x[k+1][ord[i]][i][i]);
+                    }
+                    expr2 /= m;
+                    expr2 += m -1;
+
+                    model.add(expr <= expr2);
+                }
             }
         }
 
@@ -195,7 +230,7 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
         //timeout
         cplex.setParam(IloCplex::Param::TimeLimit,7200);
         //IloCplex::Param::MIP::Strategy::HeuristicFreq
-        //cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
+        cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
         //IloCplex::Param::MIP::Display
 
         //cplex.setParam(IloCplex::Param::MIP::Display,4);
