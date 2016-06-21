@@ -219,11 +219,11 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
         }
 
         //Solving the problem
-        //env.setOut(env.getNullStream());
+        env.setOut(env.getNullStream());
         IloCplex cplex(model);
-        //cplex.setOut(env.getNullStream());
-        //cplex.setWarning(env.getNullStream());
-        //cplex.setError(env.getNullStream());
+        cplex.setOut(env.getNullStream());
+        cplex.setWarning(env.getNullStream());
+        cplex.setError(env.getNullStream());
 
         cplex.extract(model);
 
