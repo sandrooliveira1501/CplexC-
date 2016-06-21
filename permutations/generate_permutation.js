@@ -3,6 +3,18 @@ var sh = require('shelljs');
 
 var obj = {};
 obj.generatePermutation = generatePermutation;
+obj.ordPermutation = ordPermutation;
+
+function ordPermutation(permutation){
+  var ord = [];
+  for(var i = 0; i < permutation.length; i++){
+
+    ord[permutation[i]] = i;
+
+  }
+
+  return ord;
+}
 
 function generatePermutation(n){
   var permutation = [];

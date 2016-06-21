@@ -67,7 +67,6 @@ int main(int argc, const char *argv[]){
         vector<vector<Arc>> O = gerarTransposicoes(n);
 
 
-
         cout << "Multicommodity flow model - extra" << endl;
         modelFlux(l,N,ord,true, O,n,O.size());
 

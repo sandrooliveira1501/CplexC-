@@ -219,11 +219,11 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
         }
 
         //Solving the problem
-        env.setOut(env.getNullStream());
+        //env.setOut(env.getNullStream());
         IloCplex cplex(model);
-        cplex.setOut(env.getNullStream());
-        cplex.setWarning(env.getNullStream());
-        cplex.setError(env.getNullStream());
+        //cplex.setOut(env.getNullStream());
+        //cplex.setWarning(env.getNullStream());
+        //cplex.setError(env.getNullStream());
 
         cplex.extract(model);
 
@@ -236,7 +236,7 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
         //cplex.setParam(IloCplex::Param::MIP::Display,4);
         //cplex.setParam(IloCplex::RootAlg,6);
         //cplex.setParam(IloCplex::NodeAlg,6);
-        //cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 4);
+        cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 4);
         //cplex.setParam(IloCplex::MIPEmphasis, 1);
         cplex.setParam(IloCplex::Param::MIP::Tolerances::UpperCutoff, l);
 
