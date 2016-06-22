@@ -33,7 +33,7 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
             for (int j = 0; j < n; j++) {
                 x[i][j] = IloArray<IloIntVarArray> (env, n);
                 for (int k = 0; k < n; k++) {
-                    x[i][j][k] = IloIntVarArray (env,n,0, 1);
+                    x[i][j][k] = IloIntVarArray (env,n,0,IloIntMax);
                 }
             }
         }
@@ -228,15 +228,15 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
         cplex.extract(model);
 
         //timeout
-        cplex.setParam(IloCplex::Param::TimeLimit,7200);
+        //cplex.setParam(IloCplex::Param::TimeLimit,7200);
         //IloCplex::Param::MIP::Strategy::HeuristicFreq
-        cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
+        //cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
         //IloCplex::Param::MIP::Display
 
         //cplex.setParam(IloCplex::Param::MIP::Display,4);
         //cplex.setParam(IloCplex::RootAlg,6);
         //cplex.setParam(IloCplex::NodeAlg,6);
-        cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 4);
+        //cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 4);
         //cplex.setParam(IloCplex::MIPEmphasis, 1);
         cplex.setParam(IloCplex::Param::MIP::Tolerances::UpperCutoff, l);
 
@@ -244,6 +244,25 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
         if (cplex.solve()) {
             cout << "Optimal value: " << cplex.getObjValue() << endl;
             cout << cplex.getTime() << endl;
+
+            for(int k = 0; k < l; k++){
+
+                for(int i = 0; i < n; i++){
+                    cout << "k = " << k << ", i = " << i << endl;
+                    for(int a = 0; a < n; a++){
+
+                        for(int b = 0; b < n; b++){
+                            cout << cplex.getValue(x[k][i][a][b]) << " ";
+                        }
+
+                    }
+
+
+                    cout << endl;
+                }
+
+            }
+
         }else{
             cout << "timeout" << endl;
         }
