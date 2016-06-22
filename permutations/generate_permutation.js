@@ -80,9 +80,14 @@ function generatePermutation(n){
   permutationOutput = _.trimEnd(permutationOutput);
   ordOutput = _.trimEnd(ordOutput);
 
-  console.log(permutationOutput)
-  console.log(ordOutput)
-  console.log(l)
+  for(var i = 0; i < 3; i++){
+    console.log(permutationOutput);
+    console.log(ordOutput);
+    if(l == 0){
+      l = 1;
+    }
+    console.log(parseInt(l)+i);
+  }
 
   return true;
 }

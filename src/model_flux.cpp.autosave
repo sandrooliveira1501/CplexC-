@@ -43,7 +43,7 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
 
         IloExpr obj(env);
 
-        for(int k = 0; k < l;k++){
+        for(int k = 0; k < l;k++){  
             for(int i = 1; i < o; i++){
                 obj += z[k][i];
             }
