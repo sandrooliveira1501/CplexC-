@@ -6,6 +6,11 @@
 #include "model.h"
 #include "solver.h"
 #include <fstream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+
 
 using namespace std;
 
@@ -17,12 +22,17 @@ int main(int argc, const char *argv[]){
     }*/
 
     //const char* filename = argv[1];
+
+    if (stat("./output", NULL) == -1) {
+        mkdir("./output", 0700);
+    }
     const char* filename = "entrada.dat";
 
     ifstream infile;
     infile.open(filename);
 
-    std::string line;
+    string line;
+    string fileName;
 
     while (getline(infile, line)){
         int n = 0,tmp;
@@ -33,7 +43,7 @@ int main(int argc, const char *argv[]){
         istringstream tmp_iss(line);
 
         cout << line << endl;
-
+        fileName = line;
         while (tmp_iss >> tmp) {
             n++;
         }
@@ -66,13 +76,24 @@ int main(int argc, const char *argv[]){
 
         vector<vector<Arc>> O = gerarTransposicoes(n);
 
+        string saidaFluxExtra;
+        string saidaFlux;
 
         cout << "Multicommodity flow model - extra" << endl;
-        modelFlux(l,N,ord,true, O,n,O.size());
+        saidaFluxExtra = modelFlux(l,N,ord,true, O,n,O.size());
 
         cout << "Multicommodity flow model" << endl;
-        modelFlux(l,N,ord,false, O,n,O.size());
+        saidaFlux = modelFlux(l,N,ord,false, O,n,O.size());
 
+        ofstream fileFlux;
+        fileFlux.open("./output/fileFlux - " + fileName);
+        fileFlux << saidaFlux;
+        fileFlux.close();
+
+        ofstream fileFluxExtra;
+        fileFluxExtra.open("./output/fileFluxExtra - " + fileName);
+        fileFluxExtra << saidaFluxExtra;
+        fileFluxExtra.close();
 
         //cout << "Perfect Matching model" << endl;
         //model(l,N,ord,O,n,O.size());

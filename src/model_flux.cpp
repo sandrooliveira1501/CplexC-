@@ -9,10 +9,11 @@
 using namespace std;
 ILOSTLBEGIN
 
-void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int n, int o){
+string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int n, int o){
 
     IloEnv env;
 
+    stringstream logfile;
     try{
 
         IloModel model(env);
@@ -27,17 +28,16 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
         }
 
         // var x_{kiab}
-           IloArray<IloArray<IloArray<IloBoolVarArray>>> x(env, l);
-           for (int i = 0; i < l; i++) {
-               x[i] = IloArray<IloArray<IloBoolVarArray> > (env, n);
-               for (int j = 0; j < n; j++) {
-                   x[i][j] = IloArray<IloBoolVarArray> (env, n);
-                   for (int k = 0; k < n; k++) {
-                       x[i][j][k] = IloBoolVarArray (env,n);
-                   }
-               }
-           }
-
+        IloArray<IloArray<IloArray<IloIntVarArray>>> x(env, l);
+        for (int i = 0; i < l; i++) {
+            x[i] = IloArray<IloArray<IloIntVarArray> > (env, n);
+            for (int j = 0; j < n; j++) {
+                x[i][j] = IloArray<IloIntVarArray> (env, n);
+                for (int k = 0; k < n; k++) {
+                    x[i][j][k] = IloIntVarArray (env,n,0,IloIntMax);
+                }
+            }
+        }
 
         //objective function
 
@@ -89,8 +89,27 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
             }
         }
 
-        // just the arcs that are in mi can be used
+        //strips
 
+        int stripInicial = -1;
+        if(ord[0] == 0){
+            stripInicial = 0;
+            while((stripInicial < (n-1)) && N[stripInicial + 1] - N[stripInicial] == 1){
+                stripInicial++;
+            }
+
+        }
+
+        int stripFinal = n;
+        if(ord[n-1] == (n-1)){
+            stripFinal = n-1;
+            while((stripFinal > 0) && N[stripFinal] - N[stripFinal - 1] == 1){
+                stripFinal--;
+            }
+        }
+
+
+        // just the arcs that are in mi can be used
 
         for(int a = 0; a < n; a++){
             for(int b = 0; b < n; b++){
@@ -103,9 +122,33 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
                     }
 
                     for(int y = 0; y < o; y++){
-                        Arc arc(a,b);
-                        if(contains(arc, O[y])){
-                            flowCapacityTerm2 += z[k][y];
+                        bool validOperation = true;
+                        for(int aux = 0; aux <= stripInicial; aux++){
+                            Arc arcAux(aux,aux);
+                            if(!contains(arcAux, O[y])){
+                                validOperation = false;
+                                break;
+                            }
+                        }
+
+                        for(int aux = n-1; aux >= stripFinal; aux--){
+                            Arc arcAux(aux,aux);
+                            if(!contains(arcAux, O[y])){
+                                validOperation = false;
+                                break;
+                            }
+                        }
+                        //validOperation = true;
+                        if(extra == false){
+
+                            validOperation = true;
+                        }
+                        if(validOperation){
+                            Arc arc(a,b);
+
+                            if(contains(arc, O[y])){
+                                flowCapacityTerm2 += z[k][y];
+                            }
                         }
                     }
 
@@ -124,7 +167,7 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
         }
 
         //extra
-        if(extra)   {
+        if(extra){
             cout << "Restrições extras" << endl;
             for (int k = l/2; k < l-1; k++){
 
@@ -162,11 +205,7 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
             }
 
             if(ord[0] == 0){
-                int stripInicial = 0;
 
-                while((stripInicial < (n-1)) && N[stripInicial + 1] - N[stripInicial] == 1){
-                    stripInicial++;
-                }
                 for(int i = 0; i <= stripInicial; i++){
                     for(int k = 0; k < l; k++){
                        model.add(x[k][i][i][i] == 1);
@@ -175,11 +214,6 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
             }
 
             if(ord[n-1] == (n-1)){
-                int stripFinal = n-1;
-
-                while((stripFinal > 0) && N[stripFinal] - N[stripFinal - 1] == 1){
-                    stripFinal--;
-                }
 
                 for(int i = n-1; i >= stripFinal; i--){
                    for(int k = 0; k < l; k++){
@@ -220,31 +254,32 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
         }
 
         //Solving the problem
-        env.setOut(env.getNullStream());
+
+        env.setOut(logfile);
         IloCplex cplex(model);
-        cplex.setOut(env.getNullStream());
-        cplex.setWarning(env.getNullStream());
-        cplex.setError(env.getNullStream());
+        cplex.setOut(logfile);
+        cplex.setWarning(logfile);
+        cplex.setError(logfile);
 
         cplex.extract(model);
 
         //timeout
-        //cplex.setParam(IloCplex::Param::TimeLimit,7200);
+        cplex.setParam(IloCplex::Param::TimeLimit,7200);
         //IloCplex::Param::MIP::Strategy::HeuristicFreq
-        //cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
+        cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
         //IloCplex::Param::MIP::Display
 
         //cplex.setParam(IloCplex::Param::MIP::Display,4);
         //cplex.setParam(IloCplex::RootAlg,6);
         //cplex.setParam(IloCplex::NodeAlg,6);
-        //cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 4);
+        cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 4);
         //cplex.setParam(IloCplex::MIPEmphasis, 1);
         cplex.setParam(IloCplex::Param::MIP::Tolerances::UpperCutoff, l);
 
         //cplex.exportModel("/home/sandro/model1.lp");
         if (cplex.solve()) {
             cout << "Optimal value: " << cplex.getObjValue() << endl;
-            cout << "L = " << l << endl;
+            cout << "l = " << l << endl;
             cout << cplex.getTime() << endl;
 
             /*for(int k = 0; k < l; k++){
@@ -269,6 +304,7 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
             cout << "timeout" << endl;
         }
 
+
         cplex.end();
         model.end();
         obj.end();
@@ -281,4 +317,8 @@ void modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int
     }
 
     env.end();
+    const string str = logfile.str();
+    //cout << "Saída " <<  str << endl;
+
+    return str;
 }
