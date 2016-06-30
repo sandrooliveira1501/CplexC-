@@ -107,8 +107,6 @@ string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, i
                 stripFinal--;
             }
         }
-
-
         // just the arcs that are in mi can be used
 
         for(int a = 0; a < n; a++){
@@ -160,7 +158,6 @@ string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, i
             }
         }
 
-
         // constraint to u0 be always in the end
         for(int k = 0; k < l-1; k++){
             model.add(z[k][0] <= z[k+1][0]);
@@ -169,7 +166,7 @@ string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, i
         //extra
         if(extra){
             cout << "Restrições extras" << endl;
-            for (int k = l/2; k < l-1; k++){
+            for (int k = 0; k < l-1; k++){
 
                 //cout << "k = " << k << endl;
                 for (int i = 0; i < (n-1); i++){
@@ -194,7 +191,8 @@ string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, i
                                     model.add(expr1 + expr2 + x[k+1][ord[i]][b][b2] - x[k+1][ord[i+1]][b+1][b2+1] <= 2);
                                 }
 
-
+                                expr1.end();
+                                expr2.end();
                                 //model.add(expr1 + expr2 + x[k+j][ord[i]][b][b2] <= x[k+j][ord[i+1]][b+1][b2+1] + 2);
 
                                 //model.add(expr1 + expr2 + x[k+1][ord[i]][b][b2] <= x[k+1][ord[i+1]][b+1][b2+1] + 2);
@@ -223,34 +221,31 @@ string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, i
             }
 
             for(int k = 0; k < (l-1); k++){
-                for(int m = 0; m < n; m++){
-                    IloExpr expr(env);
-                    IloExpr expr2(env);
-                    for(int i = 0; i <= m; i++){
-                        expr += x[k][ord[i]][i][i];
-                        expr2 += (x[k+1][ord[i]][i][i]);
-                    }
-                    expr2 /= (m+1);
-                    expr2 += m;
-
-                    model.add(expr <= expr2);
+                for(int a = 0; a < n; a++){
+                    model.add(x[k][ord[0]][a][0] <= x[k+1][ord[0]][0][0]);
                 }
             }
 
             for(int k = 0; k < (l-1); k++){
-                for(int m = 1; m <= n; m++){
-                    IloExpr expr(env);
-                    IloExpr expr2(env);
-                    for(int i = n-1; i >= (n-m); i--){
-                        expr += x[k][ord[i]][i][i];
-                        expr2 += (x[k+1][ord[i]][i][i]);
-                    }
-                    expr2 /= m;
-                    expr2 += m -1;
-
-                    model.add(expr <= expr2);
+                for(int a = 0; a < n; a++){
+                    model.add(x[k][ord[n-1]][a][n-1] <= x[k+1][ord[n-1]][n-1][n-1]);
                 }
             }
+
+            for(int i = 0; i < (n-1); i++){
+
+                if(N[i + 1] - N[i] == 1){
+
+                    for(int b = 0; b < (n-1); b++){
+
+                        model.add(x[0][i][i][b] <= x[0][i+1][i+1][b+1]);
+
+                    }
+
+                }
+
+            }
+
         }
 
         //Solving the problem
@@ -266,13 +261,13 @@ string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, i
         //timeout
         cplex.setParam(IloCplex::Param::TimeLimit,7200);
         //IloCplex::Param::MIP::Strategy::HeuristicFreq
-        cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
+        //cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
         //IloCplex::Param::MIP::Display
 
         //cplex.setParam(IloCplex::Param::MIP::Display,4);
         //cplex.setParam(IloCplex::RootAlg,6);
         //cplex.setParam(IloCplex::NodeAlg,6);
-        cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 4);
+        //cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 4);
         //cplex.setParam(IloCplex::MIPEmphasis, 1);
         cplex.setParam(IloCplex::Param::MIP::Tolerances::UpperCutoff, l);
 
