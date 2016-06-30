@@ -16,7 +16,7 @@ function ordPermutation(permutation){
   return ord;
 }
 
-function generatePermutation(n){
+function generatePermutation(n, rep){
   var permutation = [];
   var ord = [];
 
@@ -30,7 +30,6 @@ function generatePermutation(n){
 
   }
 
-  var rep = 2;
   var newN = n * rep;
   var newPermutation = [];
   for(var i = 0; i < n; i++){
