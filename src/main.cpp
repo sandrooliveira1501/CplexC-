@@ -74,16 +74,29 @@ int main(int argc, const char *argv[]){
             return 1;
         }
 
+        int initialSolution [l][3];
+
+        for(int k = 0; k < l; k++){
+
+            getline(infile, line);
+            istringstream iss_solution(line);
+            tmp = 0;
+            while(iss_solution >> initialSolution[k][tmp]){
+                tmp++;
+            }
+
+        }
+
         vector<vector<Arc>> O = gerarTransposicoes(n);
 
         string saidaFluxExtra;
         string saidaFlux;
-
         cout << "Multicommodity flow model - extra" << endl;
-        saidaFluxExtra = modelFlux(l,N,ord,true, O,n,O.size());
+        saidaFluxExtra = modelFlux(l,N,ord,true, O,n,O.size(), initialSolution);
 
         cout << "Multicommodity flow model" << endl;
-        saidaFlux = modelFlux(l,N,ord,false, O,n,O.size());
+        saidaFlux = modelFlux(l,N,ord,false, O,n,O.size(), initialSolution);
+
 
         ofstream fileFlux;
         fileFlux.open("./output/fileFlux - " + fileName);

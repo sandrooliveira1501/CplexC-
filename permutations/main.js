@@ -1,8 +1,8 @@
 var generate = require('./generate_permutation')
 
-for(var i = 5; i <= 8; i++){
-  for (var j = 0; j < 2; j++){
-    if(!generate.generatePermutation(i,3)){
+for(var i = 11; i <= 15; i++){
+  for (var j = 0; j < 4; j++){
+    if(!generate.generatePermutation(i,1)){
       j--;
     }
   }

@@ -9,7 +9,7 @@
 using namespace std;
 ILOSTLBEGIN
 
-string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int n, int o){
+string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, int n, int o, int initialSolution[][3]){
 
     IloEnv env;
 
@@ -50,6 +50,8 @@ string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, i
         }
 
         model.add(IloMinimize(env, obj));
+        model.add(obj <= l);
+        model.add(obj >= (l*2/3));
 
         //one operator by level
         for(int k = 0; k < l; k++){
@@ -250,26 +252,98 @@ string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, i
 
         //Solving the problem
 
-        env.setOut(logfile);
+        //env.setOut(logfile);
         IloCplex cplex(model);
-        cplex.setOut(logfile);
-        cplex.setWarning(logfile);
-        cplex.setError(logfile);
+        //cplex.setOut(logfile);
+        //cplex.setWarning(logfile);
+        //cplex.setError(logfile);
 
-        cplex.extract(model);
+        //Adding initial solution
+        IloNumVarArray startVar(env);
+        IloNumArray startVal(env);
+        int permutation[n];
+        int nextPermutation[n];
+        for(int i = 0; i < n; i++){
+            nextPermutation[i] = i;
+        }
+        for(int k = 0; k < l; k++){
+            vector<Arc> transposicao = gerarTransposicao(initialSolution[k][0],initialSolution[k][1],initialSolution[k][2],n);
+            for(int i = 0; i < n; i++){
+                  permutation[i] = nextPermutation[i];
+            }
+            for(int i = 0; i < n; i++){
+                for(int a = 0; a < n; a++){
+                    for(int b = 0; b < n; b++){
+
+                        Arc arc(a,b);
+
+                        if(contains(arc, transposicao) && i == permutation[a]){
+                            nextPermutation[b] = permutation[a];
+                            //cout << a << b << permutation[a] << endl;
+                            startVar.add(x[k][i][a][b]);
+                            startVal.add(1);
+                        }else{
+                            startVar.add(x[k][i][a][b]);
+                            startVal.add(0);
+                        }
+
+                    }
+                }
+            }
+
+        }
+
+
+        for(int k = 0; k < l; k++){
+            for(int y = 0; y < o; y++){
+                int finalIndex = 0;
+                int index = 0;
+                if(initialSolution[k][0] == 0 && initialSolution[k][1] == 0 && initialSolution[k][2] == 0){
+                    finalIndex = 0;
+                }else{
+                    for(int i = 0; i <= (n-2); i++){
+                        for(int j = i + 1; j <= (n-1); j++){
+                           for(int k2 = j + 1; k2 <= n; k2++){
+                               index++;
+                               if(i == initialSolution[k][0] && j == initialSolution[k][1] && k2 == initialSolution[k][2]){
+                                    finalIndex = index;
+                               }
+                           }
+                        }
+                    }
+                }
+
+                if(y == finalIndex){
+                    startVar.add(z[k][y]);
+                    startVal.add(1);
+                }else{
+                        startVar.add(z[k][y]);
+                    startVal.add(0);
+                }
+            }
+        }
+
+        cplex.addMIPStart(startVar, startVal);
+        startVal.end();
+        startVar.end();
+
+        //cplex.extract(model);
 
         //timeout
         cplex.setParam(IloCplex::Param::TimeLimit,7200);
         //IloCplex::Param::MIP::Strategy::HeuristicFreq
-        //cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
+        //cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,1);
         //IloCplex::Param::MIP::Display
 
         //cplex.setParam(IloCplex::Param::MIP::Display,4);
         //cplex.setParam(IloCplex::RootAlg,6);
         //cplex.setParam(IloCplex::NodeAlg,6);
-        //cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 4);
-        //cplex.setParam(IloCplex::MIPEmphasis, 1);
+        cplex.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 3);
+        //cplex.setParam(IloCplex::MIPEmphasis, 2);
+        //IloCplex::Param::MIP::Limits::RepairTries
+        //cplex.setParam(IloCplex::Param::MIP::Limits::RepairTries, 5);
         cplex.setParam(IloCplex::Param::MIP::Tolerances::UpperCutoff, l);
+        cplex.setParam(IloCplex::Param::MIP::Tolerances::LowerCutoff, l*2/3);
 
         //cplex.exportModel("/home/sandro/model1.lp");
         if (cplex.solve()) {
