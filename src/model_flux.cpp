@@ -193,8 +193,11 @@ string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, i
                                     model.add(expr1 + expr2 + x[k+1][ord[i]][b][b2] - x[k+1][ord[i+1]][b+1][b2+1] <= 2);
                                 }
 
+                                // expr1 + expr2 + z_invalido <= 2
+
                                 expr1.end();
                                 expr2.end();
+
                                 //model.add(expr1 + expr2 + x[k+j][ord[i]][b][b2] <= x[k+j][ord[i+1]][b+1][b2+1] + 2);
 
                                 //model.add(expr1 + expr2 + x[k+1][ord[i]][b][b2] <= x[k+1][ord[i+1]][b+1][b2+1] + 2);
