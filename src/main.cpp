@@ -91,7 +91,7 @@ int main(int argc, const char *argv[]){
 
         string saidaFluxExtra;
         string saidaFlux;
-        cout << "Multicommodity flow model - extra" << endl;
+        /*cout << "Multicommodity flow model - extra" << endl;
         saidaFluxExtra = modelFlux(l,N,ord,true, O,n,O.size(), initialSolution);
 
         cout << "Multicommodity flow model" << endl;
@@ -106,18 +106,18 @@ int main(int argc, const char *argv[]){
         ofstream fileFluxExtra;
         fileFluxExtra.open("./output/fileFluxExtra - " + fileName);
         fileFluxExtra << saidaFluxExtra;
-        fileFluxExtra.close();
+        fileFluxExtra.close();*/
 
         //cout << "Perfect Matching model" << endl;
         //model(l,N,ord,O,n,O.size());
 
 
-        /*for(int i = 0; i < n; i++){
+        for(int i = 0; i < n; i++){
             N[i] = N[i] + 1;
         }
 
         cout << "Zanoni and Cid model" << endl;
-        exec("trans", "def", N, n);*/
+        exec("trans", "def", N, n);
 
     }
 

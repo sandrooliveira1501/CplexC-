@@ -212,6 +212,27 @@ int ILP::trans_dist(int P[], int n, const char *bt)
 		}
 		/* End Transposition Constraints */
 
+        /* Reduced breakpoint constraints */
+
+        for(k = 0; k < (n-1); k++){
+            for(i = 1; i < n; i++){
+                for(j = 1; j < n; j++){
+
+                        for(int auxJ = 1; auxJ < n; auxJ++){
+                            model.add(B[i][j][k] +  B[i+1][j+1][k] + B[j][auxJ][k+1] - B[j+1][auxJ+1][k+1] <= 2);
+                        }
+
+                }
+            }
+        }
+
+        for(k = 0; k < (n-1); k++){
+
+            model.add(B[1][1][k] <= B[1][1][k+1]);
+            model.add(B[n][n][k] <= B[n][n][k+1]);
+
+        }
+
 		/* Bounds */
 		for (k = 1; k < n; k++) {
 			model.add(TD[k] * k <= ub);
