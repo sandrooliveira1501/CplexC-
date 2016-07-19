@@ -69,7 +69,7 @@ int *perm2int(const char perm[], int &n)
 
 } /* perm2int */
 
-int exec(char* type, char* bound, int* N, int n)
+int exec(char* type, char* bound, int* N, int n, int  l)
 {
 
     const char *model = type;
@@ -94,10 +94,12 @@ int exec(char* type, char* bound, int* N, int n)
 	ILP prob(perm, perm_size, btype);
 
 	ret = -1;
+    ret = prob.trans_dist(l);
 
-	if (strcmp(TRA, model) == 0) {
+
+    /*if (strcmp(TRA, model) == 0) {
 		ret = prob.trans_dist();
-	}
+    }
 	else if (strcmp(REV, model) == 0) {
 		ret = prob.rev_dist();
 	}
@@ -111,7 +113,7 @@ int exec(char* type, char* bound, int* N, int n)
 
 	if (ret == 0) {
 		cout << "Optimal value: 0" << endl;
-	}
+    }*/
 
     //c_end = clock();
 
@@ -121,7 +123,7 @@ int exec(char* type, char* bound, int* N, int n)
     //cout << endl;
 
 	/* desallocate the memory */
-    //delete[] perm;
+    delete[] perm;
 
 	return 0;
 

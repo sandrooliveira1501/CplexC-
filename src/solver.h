@@ -4,4 +4,4 @@
 #include <cstdio>
 #include "ilp.h"
 
-int exec(char* type, char* bound, int* N, int n);
+int exec(char* type, char* bound, int* N, int n,int l);

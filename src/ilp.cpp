@@ -21,12 +21,12 @@ ILP::~ILP()
 /*
  * trans_dist
  */
-int ILP::trans_dist()
+int ILP::trans_dist(int l)
 {
-	return ILP::trans_dist(this->perm, this->perm_size, this->btype);
+    return ILP::trans_dist(this->perm, this->perm_size, this->btype, l);
 }
 
-int ILP::trans_dist(int P[], int n, const char *bt)
+int ILP::trans_dist(int P[], int n, const char *bt, int L)
 {
 	IloEnv env;
 	int dist;
@@ -66,7 +66,7 @@ int ILP::trans_dist(int P[], int n, const char *bt)
 			T[i] = IloArray<IloArray<IloBoolVarArray> > (env, n+2);
 			for (j = 0; j < n+2; j++) {
 				T[i][j] = IloArray<IloBoolVarArray> (env, n+2);
-				for (l = 0; l < n+2; l++) {
+                for (l = 0; l < n+2; l++) {
 					T[i][j][l] = IloBoolVarArray (env, n);
 				}
 			}
@@ -217,11 +217,30 @@ int ILP::trans_dist(int P[], int n, const char *bt)
         for(k = 0; k < (n-1); k++){
             for(i = 1; i < n; i++){
                 for(j = 1; j < n; j++){
+                    for(int auxJ = 1; auxJ < n; auxJ++){
+                        model.add(B[i][j][k] +  B[i+1][j+1][k] + B[j][auxJ][k+1] - B[j+1][auxJ+1][k+1] <= 2);
+                    }
 
-                        for(int auxJ = 1; auxJ < n; auxJ++){
-                            model.add(B[i][j][k] +  B[i+1][j+1][k] + B[j][auxJ][k+1] - B[j+1][auxJ+1][k+1] <= 2);
+                    IloExpr sumT(env);
+                    //IloExpr sumTBreakInit(env);
+
+                    for(int a = 1; a <= i; a++){
+                        for(int c = i+2; c < n+2; c++){
+                            sumT += T[a][i+1][c][k+1];
                         }
+                    }
 
+                    /*for(int b = i+2; b < n+1; b++){
+                        for(int c = b+1; c < n+2; c++){
+                            sumTBreakInit += T[i+1][b][c][k+1];
+                        }
+                    }*/
+
+                    IloIfThen expr(env, B[i][j][k] +  B[i+1][j+1][k] == 2, sumT == 0);
+                    //IloIfThen expr2(env, B[i][j][k] +  B[i+1][j+1][k] == 2, sumTBreakInit == 0);
+
+                    model.add(expr);
+                    //model.add(expr2);
                 }
             }
         }
@@ -233,13 +252,18 @@ int ILP::trans_dist(int P[], int n, const char *bt)
 
         }
 
+        //cout << "Upper Bound" << ub << endl;
 		/* Bounds */
-		for (k = 1; k < n; k++) {
-			model.add(TD[k] * k <= ub);
-			model.add(TD[k] * n + k - 1 >= lb);
-		}
+        for (k = 1; k < n; k++) {
+            model.add(TD[k] * k <= ub);
+            model.add(TD[k] * n + k - 1 >= lb);
+        }
 
-		/* End Constraints */
+        if(L+1 < n){
+            model.add(TD[L+1] == 0);
+        }
+
+        /* End Constraints */
 
 		/* objective function */
 		IloExpr obj(env);
@@ -257,11 +281,12 @@ int ILP::trans_dist(int P[], int n, const char *bt)
               //cplex.setWarning(env.getNullStream());
               //cplex.setError(env.getNullStream());
 
-		cplex.extract(model);
-              cplex.setParam(IloCplex::Param::TimeLimit,7200);
+        cplex.extract(model);
+        //cplex.setParam(IloCplex::Param::MIP::Tolerances::UpperCutoff, L);
+        //cplex.setParam(IloCplex::Param::MIP::Tolerances::LowerCutoff, lb);
 
 
-              if (cplex.solve()) {
+        if (cplex.solve()) {
 			dist = 0;
 			for (k = 1; k < n; k++) {
 				dist += ((cplex.getValue(TD[k]) > 0) ? 1 : 0);
