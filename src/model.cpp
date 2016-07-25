@@ -192,7 +192,7 @@ void model(int l, int N[], int ord[], std::vector<std::vector<Arc>> O, int n, in
 
         }
 
-        /*for(int k = 0; k < (l-1); k++){
+        for(int k = 0; k < (l-1); k++){
 
             for(int i = 0; i < (n-1); i++){
 
@@ -206,7 +206,7 @@ void model(int l, int N[], int ord[], std::vector<std::vector<Arc>> O, int n, in
                 }
 
             }
-        }*/
+        }
 
         //solving the problem
         env.setOut(env.getNullStream());
