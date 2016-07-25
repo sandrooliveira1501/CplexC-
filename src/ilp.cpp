@@ -270,13 +270,13 @@ int ILP::trans_dist(int P[], int n, const char *bt, int L, bool extraConstraints
 		IloExpr obj(env);
 
 		for (k = 1; k < n; k++) {
-			obj += TD[k];
-		}
+            obj += TD[k];
+        }
 
 		model.add(IloMinimize(env, obj));
 
 		/* Solving the problem */
-        env.setOut(env.getNullStream());
+        //env.setOut(env.getNullStream());
 		IloCplex cplex(env);
         cplex.setOut(env.getNullStream());
         cplex.setWarning(env.getNullStream());
@@ -287,6 +287,7 @@ int ILP::trans_dist(int P[], int n, const char *bt, int L, bool extraConstraints
         //cplex.setParam(IloCplex::Param::MIP::Tolerances::LowerCutoff, lb);
 
 
+        cplex.setParam(IloCplex::Param::TimeLimit,7200);
         if (cplex.solve()) {
 			dist = 0;
 			for (k = 1; k < n; k++) {
@@ -294,16 +295,16 @@ int ILP::trans_dist(int P[], int n, const char *bt, int L, bool extraConstraints
 
 			}
 
-                   /*cplex.out() << std::endl ;
-                   cplex.out() << "Optimal value: ";
-                   cplex.out() <<  dist << std::endl;
-                   cplex.out() << cplex.getTime() << std::endl;*/
-
-                   cout <<  "Optimal value: " << dist << endl;
-                   cout << cplex.getTime() << endl;
-            }else{
-                  cout << "timeout" << endl;
-            }
+           /*cplex.out() << std::endl ;
+           cplex.out() << "Optimal value: ";
+           cplex.out() <<  dist << std::endl;
+           cplex.out() << cplex.getTime() << std::endl;*/
+           cout << "status" << cplex.getStatus() << endl;
+           cout <<  "Optimal value: " << dist << endl;
+           cout << cplex.getTime() << endl;
+        }else{
+           cout << "timeout" << endl;
+        }
 
 
 		obj.end();
