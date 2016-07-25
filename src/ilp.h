@@ -14,8 +14,8 @@ class ILP: public Prob {
 	~ILP();
 
 	/* trans_dist */
-    int trans_dist(int l);
-    int trans_dist(int P[], int n, const char *bt, int L);
+    int trans_dist(int l, bool extraConstraints);
+    int trans_dist(int P[], int n, const char *bt, int L, bool extraConstraints);
 
 	/* rev_dist */
 	int rev_dist();

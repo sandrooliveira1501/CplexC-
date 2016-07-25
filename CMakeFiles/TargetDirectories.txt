@@ -1,3 +1,0 @@
-/home/sandro/TCC/Rearranjo-de-Genomas-Cplex-IP/CMakeFiles/edit_cache.dir
-/home/sandro/TCC/Rearranjo-de-Genomas-Cplex-IP/CMakeFiles/rebuild_cache.dir
-/home/sandro/TCC/Rearranjo-de-Genomas-Cplex-IP/CMakeFiles/Cplex_Project.dir

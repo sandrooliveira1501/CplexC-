@@ -69,7 +69,7 @@ int *perm2int(const char perm[], int &n)
 
 } /* perm2int */
 
-int exec(char* type, char* bound, int* N, int n, int  l)
+int exec(char* type, char* bound, int* N, int n, int  l, bool extraConstraints)
 {
 
     const char *model = type;
@@ -94,7 +94,7 @@ int exec(char* type, char* bound, int* N, int n, int  l)
 	ILP prob(perm, perm_size, btype);
 
 	ret = -1;
-    ret = prob.trans_dist(l);
+    ret = prob.trans_dist(l, extraConstraints);
 
 
     /*if (strcmp(TRA, model) == 0) {

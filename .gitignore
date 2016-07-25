@@ -3,3 +3,14 @@ npm-debug.log
 typings
 jsconfig.json
 *.db.*
+*.includes
+*.files
+Cplex_Project
+*.user.*
+*.user
+*.config
+*.creator.*
+*.creator
+CMakeFiles/*
+CMakeCache.txt
+cmake_install.cmake

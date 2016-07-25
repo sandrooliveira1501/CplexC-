@@ -74,7 +74,7 @@ int main(int argc, const char *argv[]){
             return 1;
         }
 
-        int initialSolution [l][3];
+        /*int initialSolution [l][3];
 
         for(int k = 0; k < l; k++){
 
@@ -85,7 +85,7 @@ int main(int argc, const char *argv[]){
                 tmp++;
             }
 
-        }
+        }*/
 
         vector<vector<Arc>> O = gerarTransposicoes(n);
 
@@ -116,8 +116,11 @@ int main(int argc, const char *argv[]){
             N[i] = N[i] + 1;
         }
 
+        cout << "Zanoni and Cid model - Extra Constraints" << endl;
+        exec("trans", "def", N, n, l, true);
+
         cout << "Zanoni and Cid model" << endl;
-        exec("trans", "def", N, n, l);
+        exec("trans", "def", N, n, l, false);
 
     }
 

@@ -21,12 +21,12 @@ ILP::~ILP()
 /*
  * trans_dist
  */
-int ILP::trans_dist(int l)
+int ILP::trans_dist(int l, bool extraConstraints)
 {
-    return ILP::trans_dist(this->perm, this->perm_size, this->btype, l);
+    return ILP::trans_dist(this->perm, this->perm_size, this->btype, l, extraConstraints);
 }
 
-int ILP::trans_dist(int P[], int n, const char *bt, int L)
+int ILP::trans_dist(int P[], int n, const char *bt, int L, bool extraConstraints)
 {
 	IloEnv env;
 	int dist;
@@ -213,43 +213,48 @@ int ILP::trans_dist(int P[], int n, const char *bt, int L)
 		/* End Transposition Constraints */
 
         /* Reduced breakpoint constraints */
-
-        for(k = 0; k < (n-1); k++){
-            for(i = 1; i < n; i++){
-                for(j = 1; j < n; j++){
-                    for(int auxJ = 1; auxJ < n; auxJ++){
-                        model.add(B[i][j][k] +  B[i+1][j+1][k] + B[j][auxJ][k+1] - B[j+1][auxJ+1][k+1] <= 2);
-                    }
-
-                    IloExpr sumT(env);
-                    //IloExpr sumTBreakInit(env);
-
-                    for(int a = 1; a <= i; a++){
-                        for(int c = i+2; c < n+2; c++){
-                            sumT += T[a][i+1][c][k+1];
+        if(extraConstraints){
+            for(k = 0; k < (n-1); k++){
+                for(i = 1; i < n; i++){
+                    for(j = 1; j < n; j++){
+                        for(int auxJ = 1; auxJ < n; auxJ++){
+                            model.add(B[i][j][k] +  B[i+1][j+1][k] + B[j][auxJ][k+1] - B[j+1][auxJ+1][k+1] <= 2);
                         }
-                    }
 
-                    /*for(int b = i+2; b < n+1; b++){
-                        for(int c = b+1; c < n+2; c++){
-                            sumTBreakInit += T[i+1][b][c][k+1];
+                        IloExpr sumT(env);
+                        //IloExpr sumTBreakInit(env);
+
+                        for(int a = 1; a <= i; a++){
+                            for(int c = i+2; c < n+2; c++){
+                                sumT += T[a][i+1][c][k+1];
+                            }
                         }
-                    }*/
 
-                    IloIfThen expr(env, B[i][j][k] +  B[i+1][j+1][k] == 2, sumT == 0);
-                    //IloIfThen expr2(env, B[i][j][k] +  B[i+1][j+1][k] == 2, sumTBreakInit == 0);
+                        /*for(int b = i+2; b < n+1; b++){
+                            for(int c = b+1; c < n+2; c++){
+                                sumTBreakInit += T[i+1][b][c][k+1];
+                            }
+                        }*/
 
-                    model.add(expr);
-                    //model.add(expr2);
+                        IloIfThen expr(env, B[i][j][k] +  B[i+1][j+1][k] == 2, sumT == 0);
+                        //IloIfThen expr2(env, B[i][j][k] +  B[i+1][j+1][k] == 2, sumTBreakInit == 0);
+
+                        model.add(expr);
+                        //model.add(expr2);
+                    }
                 }
             }
-        }
 
-        for(k = 0; k < (n-1); k++){
+            for(k = 0; k < (n-1); k++){
 
-            model.add(B[1][1][k] <= B[1][1][k+1]);
-            model.add(B[n][n][k] <= B[n][n][k+1]);
+                model.add(B[1][1][k] <= B[1][1][k+1]);
+                model.add(B[n][n][k] <= B[n][n][k+1]);
 
+            }
+
+            if(L+1 < n){
+                model.add(TD[L+1] == 0);
+            }
         }
 
         //cout << "Upper Bound" << ub << endl;
@@ -257,10 +262,6 @@ int ILP::trans_dist(int P[], int n, const char *bt, int L)
         for (k = 1; k < n; k++) {
             model.add(TD[k] * k <= ub);
             model.add(TD[k] * n + k - 1 >= lb);
-        }
-
-        if(L+1 < n){
-            model.add(TD[L+1] == 0);
         }
 
         /* End Constraints */
@@ -275,11 +276,11 @@ int ILP::trans_dist(int P[], int n, const char *bt, int L)
 		model.add(IloMinimize(env, obj));
 
 		/* Solving the problem */
-              //env.setOut(env.getNullStream());
+        env.setOut(env.getNullStream());
 		IloCplex cplex(env);
-              //cplex.setOut(env.getNullStream());
-              //cplex.setWarning(env.getNullStream());
-              //cplex.setError(env.getNullStream());
+        cplex.setOut(env.getNullStream());
+        cplex.setWarning(env.getNullStream());
+        cplex.setError(env.getNullStream());
 
         cplex.extract(model);
         //cplex.setParam(IloCplex::Param::MIP::Tolerances::UpperCutoff, L);

@@ -56,9 +56,9 @@ function generatePermutation(n, rep){
     entrada += "," + (permutation[i] + 1);
   }
   //console.log(entrada);
-  var command = "python2.6 ../code_dias2012/dias2010_1_375.py " + entrada;
-  var command2 = "python2.6 ../code_dias2012/elias2005.py " + entrada;
-  var command3 = "python2.6 ../code_dias2012/dias2010_1_5.py " + entrada;
+  var command = "python2 ../code_dias2012/dias2010_1_375.py " + entrada;
+  var command2 = "python2 ../code_dias2012/elias2005.py " + entrada;
+  var command3 = "python2 ../code_dias2012/dias2010_1_5.py " + entrada;
 
   var process = sh.exec(command, {silent:true});
   var output = _.split(process.stdout, " - ");
