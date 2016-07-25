@@ -192,13 +192,29 @@ void model(int l, int N[], int ord[], std::vector<std::vector<Arc>> O, int n, in
 
         }
 
+        /*for(int k = 0; k < (l-1); k++){
+
+            for(int i = 0; i < (n-1); i++){
+
+                for(int j = 0; j < (n-1); j++){
+
+
+                    IloIfThen breakpointReduction(env, v[k][i+1] - v[k][i] == 1, b[i][j][k+1] - b[i+1][j+1][k+1] <= 0);
+
+                    model.add(breakpointReduction);
+
+                }
+
+            }
+        }*/
+
         //solving the problem
-        //env.setOut(env.getNullStream());
+        env.setOut(env.getNullStream());
         IloCplex cplex(model);
-        //cplex.setOut(env.getNullStream());
-        //cplex.setWarning(env.getNullStream());
-        //cplex.setError(env.getNullStream());
-        //cplex.extract(model);
+        cplex.setOut(env.getNullStream());
+        cplex.setWarning(env.getNullStream());
+        cplex.setError(env.getNullStream());
+        cplex.extract(model);
 
         //cplex.exportModel("/home/alexsandro/model2.lp");
         cplex.setParam(IloCplex::Param::TimeLimit,7200);

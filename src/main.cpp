@@ -108,19 +108,19 @@ int main(int argc, const char *argv[]){
         fileFluxExtra << saidaFluxExtra;
         fileFluxExtra.close();*/
 
-        //cout << "Perfect Matching model" << endl;
-        //model(l,N,ord,O,n,O.size());
+        cout << "Perfect Matching model" << endl;
+        model(l,N,ord,O,n,O.size());
 
 
         for(int i = 0; i < n; i++){
             N[i] = N[i] + 1;
         }
 
-        cout << "Zanoni and Cid model - Extra Constraints" << endl;
-        exec("trans", "def", N, n, l, true);
+        //cout << "Zanoni and Cid model - Extra Constraints" << endl;
+        //exec("trans", "def", N, n, l, true);
 
-        cout << "Zanoni and Cid model" << endl;
-        exec("trans", "def", N, n, l, false);
+        //cout << "Zanoni and Cid model" << endl;
+        //exec("trans", "def", N, n, l, false);
 
         delete[] N;
     }
