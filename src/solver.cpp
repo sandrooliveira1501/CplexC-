@@ -123,7 +123,7 @@ int exec(char* type, char* bound, int* N, int n, int  l, bool extraConstraints)
     //cout << endl;
 
 	/* desallocate the memory */
-    delete[] perm;
+    //delete[] perm;
 
 	return 0;
 

@@ -122,6 +122,7 @@ int main(int argc, const char *argv[]){
         cout << "Zanoni and Cid model" << endl;
         exec("trans", "def", N, n, l, false);
 
+        delete[] N;
     }
 
     infile.close();
