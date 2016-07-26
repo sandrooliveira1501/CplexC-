@@ -108,8 +108,11 @@ int main(int argc, const char *argv[]){
         fileFluxExtra << saidaFluxExtra;
         fileFluxExtra.close();*/
 
+        cout << "Perfect Matching model - Extra Constraints" << endl;
+        model(l,N,ord,O,n,O.size(), true);
+
         cout << "Perfect Matching model" << endl;
-        model(l,N,ord,O,n,O.size());
+        model(l,N,ord,O,n,O.size(), false);
 
 
         for(int i = 0; i < n; i++){

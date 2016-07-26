@@ -8,7 +8,7 @@
 using namespace std;
 ILOSTLBEGIN
 
-void model(int l, int N[], int ord[], std::vector<std::vector<Arc>> O, int n, int o){
+void model(int l, int N[], int ord[], std::vector<std::vector<Arc>> O, int n, int o, bool useBreakpointRed){
 
     IloEnv env;
 
@@ -113,38 +113,39 @@ void model(int l, int N[], int ord[], std::vector<std::vector<Arc>> O, int n, in
 
         }
 
+        if(useBreakpointRed){
+            if(ord[0] == 0){
+                int stripInicial = 0;
 
-        if(ord[0] == 0){
-            int stripInicial = 0;
-
-            while((stripInicial < (n-1)) && N[stripInicial + 1] - N[stripInicial] == 1){
-                stripInicial++;
-            }
-            cout << stripInicial << endl;
-            for(int i = 0; i <= stripInicial; i++){
-                IloExpr expr(env);
-                for(int k = 0; k < l; k++){
-                   expr += b[i][i][k];
-                   model.add(v[k+1][i] == i);
+                while((stripInicial < (n-1)) && N[stripInicial + 1] - N[stripInicial] == 1){
+                    stripInicial++;
                 }
-                model.add(expr == l);
-            }
-        }
-
-        if(ord[n-1] == n-1){
-            int stripFinal = n-1;
-
-            while((stripFinal > 0) && N[stripFinal] - N[stripFinal - 1] == 1){
-                stripFinal--;
-            }
-
-            for(int i = n-1; i >= stripFinal; i--){
-                IloExpr expr(env);
-                for(int k = 0; k < l; k++){
-                   expr += b[i][i][k];
-                   model.add(v[k+1][i] == i);
+                cout << stripInicial << endl;
+                for(int i = 0; i <= stripInicial; i++){
+                    IloExpr expr(env);
+                    for(int k = 0; k < l; k++){
+                       expr += b[i][i][k];
+                       model.add(v[k+1][i] == i);
+                    }
+                    model.add(expr == l);
                 }
-                model.add(expr == l);
+            }
+
+            if(ord[n-1] == n-1){
+                int stripFinal = n-1;
+
+                while((stripFinal > 0) && N[stripFinal] - N[stripFinal - 1] == 1){
+                    stripFinal--;
+                }
+
+                for(int i = n-1; i >= stripFinal; i--){
+                    IloExpr expr(env);
+                    for(int k = 0; k < l; k++){
+                       expr += b[i][i][k];
+                       model.add(v[k+1][i] == i);
+                    }
+                    model.add(expr == l);
+                }
             }
         }
 
@@ -159,17 +160,19 @@ void model(int l, int N[], int ord[], std::vector<std::vector<Arc>> O, int n, in
                     expr += b[arc.a][arc.b][k];
                  }
 
-                if(ord[0] == 0){
-                    Arc arc = transposition[0];
-                    if(arc.b != 0){
-                        model.add(m[t][k] == 0);
+                if(useBreakpointRed){
+                    if(ord[0] == 0){
+                        Arc arc = transposition[0];
+                        if(arc.b != 0){
+                            model.add(m[t][k] == 0);
+                        }
                     }
-                }
 
-                if(ord[n-1] == n-1){
-                    Arc arc = transposition[n-1];
-                    if(arc.b != n-1){
-                        model.add(m[t][k] == 0);
+                    if(ord[n-1] == n-1){
+                        Arc arc = transposition[n-1];
+                        if(arc.b != n-1){
+                            model.add(m[t][k] == 0);
+                        }
                     }
                 }
 
@@ -181,30 +184,33 @@ void model(int l, int N[], int ord[], std::vector<std::vector<Arc>> O, int n, in
 
         }
 
-        for(int k = 0; k < (l - 1); k++){
 
-            IloIfThen ifThenInitial(env, v[k+1][0] == 0, v[k+2][0] == 0);
-            model.add(ifThenInitial);
+        if(useBreakpointRed){
+            for(int k = 0; k < (l - 1); k++){
 
-
-            IloIfThen ifThenFinal(env, v[k+1][n-1] == n-1, v[k+2][n-1] == n-1);
-            model.add(ifThenFinal);
-
-        }
-
-        for(int k = 0; k < (l-1); k++){
-
-            for(int i = 0; i < (n-1); i++){
-
-                for(int j = 0; j < (n-1); j++){
+                IloIfThen ifThenInitial(env, v[k+1][0] == 0, v[k+2][0] == 0);
+                model.add(ifThenInitial);
 
 
-                    IloIfThen breakpointReduction(env, v[k][i+1] - v[k][i] == 1, b[i][j][k+1] - b[i+1][j+1][k+1] <= 0);
+                IloIfThen ifThenFinal(env, v[k+1][n-1] == n-1, v[k+2][n-1] == n-1);
+                model.add(ifThenFinal);
 
-                    model.add(breakpointReduction);
+            }
+
+            for(int k = 0; k < (l-1); k++){
+
+                for(int i = 0; i < (n-1); i++){
+
+                    for(int j = 0; j < (n-1); j++){
+
+
+                        IloIfThen breakpointReduction(env, v[k][i+1] - v[k][i] == 1, b[i][j][k+1] - b[i+1][j+1][k+1] <= 0);
+
+                        model.add(breakpointReduction);
+
+                    }
 
                 }
-
             }
         }
 
