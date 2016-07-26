@@ -255,13 +255,13 @@ string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, i
 
         //Solving the problem
 
-        //env.setOut(logfile);
+        env.setOut(logfile);
         IloCplex cplex(model);
-        //cplex.setOut(logfile);
-        //cplex.setWarning(logfile);
-        //cplex.setError(logfile);
+        cplex.setOut(logfile);
+        cplex.setWarning(logfile);
+        cplex.setError(logfile);
 
-        //Adding initial solution
+        /*//Adding initial solution
         IloNumVarArray startVar(env);
         IloNumArray startVal(env);
         int permutation[n];
@@ -328,9 +328,9 @@ string modelFlux(int l, int N[],int  ord[], bool extra, vector<vector<Arc>> O, i
 
         cplex.addMIPStart(startVar, startVal);
         startVal.end();
-        startVar.end();
+        startVar.end();*/
 
-        //cplex.extract(model);
+        cplex.extract(model);
 
         //timeout
         cplex.setParam(IloCplex::Param::TimeLimit,7200);

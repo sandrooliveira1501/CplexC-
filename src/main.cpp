@@ -74,9 +74,9 @@ int main(int argc, const char *argv[]){
             return 1;
         }
 
-        /*int initialSolution [l][3];
+        int initialSolution [l][3];
 
-        for(int k = 0; k < l; k++){
+        /*for(int k = 0; k < l; k++){
 
             getline(infile, line);
             istringstream iss_solution(line);
@@ -91,14 +91,14 @@ int main(int argc, const char *argv[]){
 
         string saidaFluxExtra;
         string saidaFlux;
-        /*cout << "Multicommodity flow model - extra" << endl;
+        cout << "Multicommodity flow model - extra" << endl;
         saidaFluxExtra = modelFlux(l,N,ord,true, O,n,O.size(), initialSolution);
 
         cout << "Multicommodity flow model" << endl;
         saidaFlux = modelFlux(l,N,ord,false, O,n,O.size(), initialSolution);
 
 
-        ofstream fileFlux;
+        /*ofstream fileFlux;
         fileFlux.open("./output/fileFlux - " + fileName);
         fileFlux << saidaFlux;
         fileFlux.close();
@@ -108,16 +108,16 @@ int main(int argc, const char *argv[]){
         fileFluxExtra << saidaFluxExtra;
         fileFluxExtra.close();*/
 
-        cout << "Perfect Matching model - Extra Constraints" << endl;
-        model(l,N,ord,O,n,O.size(), true);
+        //cout << "Perfect Matching model - Extra Constraints" << endl;
+        //model(l,N,ord,O,n,O.size(), true);
 
-        cout << "Perfect Matching model" << endl;
-        model(l,N,ord,O,n,O.size(), false);
+        //cout << "Perfect Matching model" << endl;
+        //model(l,N,ord,O,n,O.size(), false);
 
 
-        for(int i = 0; i < n; i++){
+        /*for(int i = 0; i < n; i++){
             N[i] = N[i] + 1;
-        }
+        }*/
 
         //cout << "Zanoni and Cid model - Extra Constraints" << endl;
         //exec("trans", "def", N, n, l, true);
